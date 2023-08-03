@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Star;
 
-public class Path : MonoBehaviour
+namespace Path
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Path
     {
-        
-    }
+        public Star.Star star1;
+        public Star.Star star2;
+        public double speedRate { get; set; } = 1.0f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public Path(Star.Star star1, Star.Star star2)
+        {
+            this.star1 = star1;
+            this.star2 = star2;
+        }
     }
 }
