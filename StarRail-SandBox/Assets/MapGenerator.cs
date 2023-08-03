@@ -61,6 +61,7 @@ public class MapGenerator : MonoBehaviour
         float scale = 0.2f; // Adjust this to set your desired size
         starObj.transform.localScale = new Vector3(scale, scale, 1f);
 
+
         // Create and set up the CircleCollider2D
         CircleCollider2D collider = starObj.AddComponent<CircleCollider2D>();
         collider.radius = 0.2f;
