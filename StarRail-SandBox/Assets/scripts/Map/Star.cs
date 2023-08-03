@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using MapResources; 
 
-public class Star : MonoBehaviour
+namespace Star
 {
-    public int id { get; }
-    public int type { get; set; }
-    public Vector2 pos { get; set; }
-    public bool isLivable = false;
-    public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
+    public class Star
+    {
+        public int id { get; }
+        public int type { get; set; }
+        public Vector2 pos { get; set; }
+        public bool isLivable = false;
+        public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
             {
                 {MapResources.Resources.Population, 0},
                 {MapResources.Resources.Food, 0},
@@ -18,21 +20,46 @@ public class Star : MonoBehaviour
                 {MapResources.Resources.Technology, 0}
             };
 
-    public Star(int id, Vector2 pos)
-    {   
-        this.id = id;
-        this.pos = pos;
-    }
+        public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
+        {
+            this.id = id;
+            this.pos = pos;
 
-    // Start is called before the first frame update
-    void Start()
-    {
+            // ≈–∂® «∑Ò «∫⁄∂¥
+            float randomNumber = UnityEngine.Random.Range(0f, 1f);
+            if (randomNumber > blackholeRate)
+            {
+                this.type = 0;
 
-    }
+                // ≈–∂® «∑Ò“Àæ”
+                randomNumber = UnityEngine.Random.Range(0f, 1f);
+                if (randomNumber < livableRate) { this.isLivable = true; }
+                else { this.isLivable = false; }
+            }
+            else { this.type = 1; this.isLivable = false; }
 
-    // Update is called once per frame
-    void Update()
-    {
+            fillResources();
+        }
+
+        public void fillResources()
+        {
+            if (this.type == 1)
+            {
+                this.resources[MapResources.Resources.Technology] = UnityEngine.Random.Range(10, 21);
+                this.resources[MapResources.Resources.Energy] = UnityEngine.Random.Range(10, 21);
+            }
+            else
+            {
+                this.resources[MapResources.Resources.Energy] = UnityEngine.Random.Range(5, 21);
+                this.resources[MapResources.Resources.Metal] = UnityEngine.Random.Range(5, 21);
+                if (this.isLivable)
+                {
+                    this.resources[MapResources.Resources.Food] = UnityEngine.Random.Range(5, 21);
+                }
+            }
+        }
+
+
 
     }
 }

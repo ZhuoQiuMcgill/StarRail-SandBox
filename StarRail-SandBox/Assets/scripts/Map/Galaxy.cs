@@ -1,18 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Path;
+using Star;
 
-public class Galaxy : MonoBehaviour
+namespace Galaxy
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Galaxy
     {
-        
-    }
+        public int numStars;
+        public int width;
+        public int height;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public List<Star.Star> stars = new List<Star.Star>();
+        public List<Path.Path> paths = new List<Path.Path>();
+
+        public Galaxy(int numStars, int width, int height)
+        {
+            this.numStars = numStars;
+            this.width = width;
+            this.height = height;
+        }
+
     }
 }
+
+
