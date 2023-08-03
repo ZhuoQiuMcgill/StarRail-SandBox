@@ -3,7 +3,7 @@
 ## 基本派系行动
 <details>
 <summary>殖民</summary>
-### TBD
+### You can add a header
 </details>
 <details>
 <summary>战争</summary>
