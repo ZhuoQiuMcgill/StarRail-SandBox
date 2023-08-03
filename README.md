@@ -56,12 +56,25 @@ Last update: 2023/8/3
 ## 基本派系行动
 <details>
 <summary>殖民</summary>
-### You can add a header
+使用令使在星球上建立前哨站，使当前星球成为该派系的领地范围（所需tick数：？？）
 </details>
 <details>
 <summary>战争</summary>
-### TBD
+使用令使把当前星球上的工作人口转化为战争人口
 </details>
+<details>
+<summary>建造</summary>
+使用人口在当前星球上建造设施，所需tick数与当前星球人口相关
+</details>
+<details>
+<summary>TBD</summary>
+TBD
+</details>
+<details>
+<summary>TBD</summary>
+TBD
+</details>
+
 
 ## 派系特殊行动
 <details>
