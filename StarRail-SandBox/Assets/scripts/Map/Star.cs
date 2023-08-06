@@ -12,6 +12,7 @@ namespace Star
         public Vector2 pos { get; set; }
         public bool isLivable = false;
         public bool isDestroyed = false;
+        public List<Star> adj;
 
         // 资源数值
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
@@ -33,6 +34,7 @@ namespace Star
         {
             this.id = id;
             this.pos = pos;
+            this.adj = new List<Star>();
 
             // 判定是否是黑洞
             float randomNumber = UnityEngine.Random.Range(0f, 1f);
