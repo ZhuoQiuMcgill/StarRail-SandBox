@@ -7,31 +7,40 @@ using Path;
 
 public class GameManager : MonoBehaviour
 {
-    public List<Star.Star> stars = new List<Star.Star>();
-    public List<GameObject> starprefabs = new List<GameObject>();
-    public List<Path.Path> paths = new List<Path.Path>();
-    public List<GameObject> pathprefabs = new List<GameObject>();
+    public int width = 10000;
+    public int height = 5000;
+    public int numStars = 1000;
+
+    private Galaxy.Galaxy map;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        foreach (Star.Star star in stars)
-        {
-            GameObject newstar = CreateGameObjectFromstar(star);
-            starprefabs.Add(newstar);
-        }  
-        foreach (Path.Path path in paths)
-        {
-            GameObject newpath = CreateGameObjectFrompath(path);
-            pathprefabs.Add(newpath);
-        }
+        // 创建地图
+        Galaxy.Galaxy map = new Galaxy.Galaxy(this.numStars, this.width, this.height);
+        this.map = map;
+        CreateGameObject();
+        rander();
+
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    // TODO: 将map里的星系以及路径生成成对应的gameobject
+    private void CreateGameObject()
+    {
+
+    }
+
+    // TODO: 将已经生产的gameobject渲染至画面
+    private void rander()
+    {
+
     }
 
     private GameObject CreateGameObjectFromstar(Star.Star star)

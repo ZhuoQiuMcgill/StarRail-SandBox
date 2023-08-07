@@ -16,8 +16,8 @@ namespace Galaxy
         public int width;
         public int height;
 
-        public List<Star.Star> stars = new List<Star.Star>();
-        public List<Path.Path> paths = new List<Path.Path>();
+        public List<Star.Star> stars { get; } = new List<Star.Star>();
+        public List<Path.Path> paths { get; } = new List<Path.Path>();
 
         private Dictionary<Star.Star, Star.Star> parent = new Dictionary<Star.Star, Star.Star>();
         private Dictionary<Star.Star, int> rank = new Dictionary<Star.Star, int>();
