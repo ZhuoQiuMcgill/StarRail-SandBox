@@ -27,7 +27,7 @@ namespace Galaxy
         private List<List<List<Star.Star>>> grid;   // 地图分区
         private int gridSize = 100;                 // 分区大小
         private float[] pathRate = new float[] { 1.0f, 0.8f, 0.8f, 0.4f };
-        private int maxDegree;    // 每个星系的最大路径
+        private int maxDegree;                      // 每个星系的最大路径
 
 
         public Galaxy(int numStars, int width, int height)
@@ -126,8 +126,23 @@ namespace Galaxy
             }
 
 
-            // TODO: 完善路径生成算法
+            // 连接星系，生成路径
+            Star.Star[] cloestStars;
+            float randomNumber;
+            foreach (Star.Star star in this.stars)
+            {
+                cloestStars = CloestStars(star, this.maxDegree);
 
+                for (int i = 0; i < this.maxDegree; i++)
+                {
+                    // 计算生成路径的概率
+                    randomNumber = UnityEngine.Random.Range(0f, 1f);
+                    if (randomNumber < this.pathRate[i])
+                    {
+                        this.paths.Add(new Path.Path(star, cloestStars[i]));
+                    }
+                }
+            }
 
 
 
