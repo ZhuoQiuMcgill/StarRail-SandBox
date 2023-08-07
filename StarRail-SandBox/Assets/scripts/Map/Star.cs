@@ -12,7 +12,7 @@ namespace Star
         public Vector2 pos { get; set; }
         public bool isLivable = false;
         public bool isDestroyed = false;
-        public List<Star> adj;
+        public List<Star> adj { get; set; }
 
         // 资源数值
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
