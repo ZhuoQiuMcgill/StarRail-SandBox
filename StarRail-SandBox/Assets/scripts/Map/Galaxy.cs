@@ -27,7 +27,7 @@ namespace Galaxy
         private List<List<List<Star.Star>>> grid;   // 地图分区
         private int gridSize = 100;                 // 分区大小
         private float[] pathRate = new float[] { 1.0f, 0.8f, 0.8f, 0.4f };
-        private int maxDegree;    // 每个星系的最大路径
+        private int maxDegree;                      // 每个星系的最大路径
 
 
         public Galaxy(int numStars, int width, int height)
@@ -115,55 +115,90 @@ namespace Galaxy
             for (int i = 0; i < numStars; i++)
             {
                 Vector2 pos = new Vector2(UnityEngine.Random.Range(0, width), UnityEngine.Random.Range(0, height));
-
-                // 计算出星系所属的格子坐标
                 int xPos = (int)(pos.x / this.gridSize);
                 int yPos = (int)(pos.y / this.gridSize);
-
                 Star.Star star = new Star.Star(i, pos, this.livableRate, this.blackholeRate);
                 this.stars.Add(star);
                 this.grid[xPos][yPos].Add(star);
             }
 
+            // 连接星系，生成路径
+            foreach (Star.Star star in this.stars)
+            {
+                Star.Star[] cloestStars = CloestStars(star, this.maxDegree);
+                for (int i = 0; i < this.maxDegree; i++)
+                {
+                    float randomNumber = UnityEngine.Random.Range(0f, 1f);
+                    if (randomNumber < this.pathRate[i])
+                    {
+                        this.paths.Add(new Path.Path(star, cloestStars[i]));
+                        star.adj.Add(cloestStars[i]);
+                    }
+                }
+            }
 
-            // TODO: 完善路径生成算法
-
-
-
-
-
-
-
-
-            // Initialize the disjoint set
-            foreach (Star.Star star in stars)
+            // 使用并查集确保所有星系的连通性
+            // 1. 初始化
+            foreach (Star.Star star in this.stars)
             {
                 parent[star] = star;
                 rank[star] = 0;
             }
 
-            // Generate all possible paths and sort them by length
-            List<Path.Path> possiblePaths = new List<Path.Path>();
-            for (int i = 0; i < numStars - 1; i++)
+            // 2. 使用Union合并
+            foreach (Path.Path path in this.paths)
             {
-                for (int j = i + 1; j < numStars; j++)
-                {
-                    Path.Path path = new Path.Path(stars[i], stars[j]);
-                    possiblePaths.Add(path);
-                }
+                Union(path.star1, path.star2);
             }
-            possiblePaths.Sort((p1, p2) => Vector2.Distance(p1.star1.pos, p1.star2.pos).CompareTo(Vector2.Distance(p2.star1.pos, p2.star2.pos)));
 
-            // Apply Kruskal's Algorithm to find the minimum spanning tree
-            foreach (Path.Path path in possiblePaths)
+            // 3. 找出所有的代表星系
+            HashSet<Star.Star> representatives = new HashSet<Star.Star>();
+            foreach (Star.Star star in this.stars)
             {
-                if (Find(path.star1) != Find(path.star2)) // Check if two stars are in the same set
+                representatives.Add(Find(star));
+            }
+
+            // 4. 为每对独立的代表星系添加最短路径
+            while (representatives.Count > 1)
+            {
+                Star.Star[] reps = representatives.ToArray();
+                Star.Star repA = reps[0];
+                Star.Star closestToRepA = null;
+                double minDistance = double.MaxValue;
+
+                foreach (Star.Star repB in representatives)
                 {
-                    paths.Add(path);
-                    Union(path.star1, path.star2); // Merge two sets
+                    if (repA != repB)
+                    {
+                        foreach (Star.Star aMember in this.stars.Where(s => Find(s) == repA))
+                        {
+                            foreach (Star.Star bMember in this.stars.Where(s => Find(s) == repB))
+                            {
+                                double distance = Vector2.Distance(aMember.pos, bMember.pos);
+                                if (distance < minDistance)
+                                {
+                                    closestToRepA = bMember;
+                                    minDistance = distance;
+                                }
+                            }
+                        }
+
+                        if (closestToRepA != null)
+                        {
+                            this.paths.Add(new Path.Path(repA, closestToRepA));
+                            repA.adj.Add(closestToRepA);
+                            closestToRepA.adj.Add(repA);
+                            Union(repA, closestToRepA);
+                        }
+
+                        representatives.Remove(repA);
+                        representatives.Remove(closestToRepA);
+                        representatives.Add(Find(repA));  // 重新加入新的代表
+                    }
                 }
             }
         }
+
 
 
 
