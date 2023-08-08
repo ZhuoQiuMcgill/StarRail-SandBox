@@ -7,9 +7,9 @@ using Path;
 
 public class GameManager : MonoBehaviour
 {
-    public int width = 10000;
-    public int height = 5000;
-    public int numStars = 1000;
+    public int width = 1000;
+    public int height = 500;
+    public int numStars = 100;
 
     private Galaxy.Galaxy map;
     //转录为GameObject list
@@ -22,10 +22,21 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // 查看pathprefab是否正确绑定
+        if (pathprefab == null)
+        {
+            Debug.LogError("pathPrefab is null!");
+        }
+        else
+        {
+            Debug.Log("pathPrefab is correctly assigned.");
+        }
+
         // 创建地图
         Debug.Log("Before Map Create");
         Galaxy.Galaxy map = new Galaxy.Galaxy(this.numStars, this.width, this.height);
         Debug.Log("Map create successed");
+        Debug.Log(map.paths.Count);
         this.map = map;
         CreateGameObject();
         rander();
@@ -48,12 +59,12 @@ public class GameManager : MonoBehaviour
 
         foreach (Path.Path path in this.map.paths)
         {
-            GameObject newPath = CreateGameObjectFrompath(path);
+            GameObject newPath = CreateGameObjectFromPath(path);
             renderedStar.Add(newPath);
         }
     }
 
-    private GameObject CreateGameObjectFrompath(Path.Path path)
+    private GameObject CreateGameObjectFromPath(Path.Path path)
     {
         Vector2 pos1 = path.star1.pos;
         Vector2 pos2 = path.star2.pos;
@@ -68,21 +79,29 @@ public class GameManager : MonoBehaviour
         float angleRad = Mathf.Atan2(pos2.y - pos1.y, pos2.x - pos1.x);
         float angleDeg = angleRad * Mathf.Rad2Deg;
 
-        // 创建GameObject，并以两个星系的ID为名
+        // 实例化预制体
+        GameObject rectangleObj = Instantiate(pathprefab);
+
+        // 设定名字
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
-        GameObject rectangleObj = new GameObject(rectangleName);
-        var rectTransform = rectangleObj.AddComponent<RectTransform>();
+        rectangleObj.name = rectangleName;
 
-        // 假设宽度为0.5，可以根据需要更改
-        float width = 0.5f;
+        RectTransform rectTransform = rectangleObj.GetComponent<RectTransform>();
 
-        rectTransform.sizeDelta = new Vector2(length, width);
-        rectTransform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
-        rectTransform.rotation = Quaternion.Euler(0, 0, angleDeg);
-
+        if (rectTransform != null)
+        {
+            rectTransform.sizeDelta = new Vector2(length, 0.5f); // Assuming a width of 0.5, adjust as needed
+            rectTransform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
+            rectTransform.rotation = Quaternion.Euler(0, 0, angleDeg);
+        }
+        else
+        {
+            Debug.LogError($"No RectTransform on prefab for path {rectangleName}");
+        }
 
         return rectangleObj;
     }
+
 
     private GameObject CreateGameObjectFromstar(Star.Star star)
     {

@@ -137,6 +137,8 @@ namespace Galaxy
                 }
             }
 
+
+            /**
             // 使用并查集确保所有星系的连通性
             // 1. 初始化
             foreach (Star.Star star in this.stars)
@@ -210,6 +212,7 @@ namespace Galaxy
                     representatives.Add(item);
                 }
             }
+            */
         }
 
 
