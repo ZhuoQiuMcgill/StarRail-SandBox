@@ -10,6 +10,7 @@ namespace Path
         public Star.Star star1;
         public Star.Star star2;
         public double speedRate { get; set; } = 1.0f;
+        public bool unionPath { get; set; } = false;
 
         public Path(Star.Star star1, Star.Star star2)
         {

@@ -26,8 +26,10 @@ namespace Galaxy
         private double blackholeRate = 0.05;        // 生成黑洞星系的概率
         private List<List<List<Star.Star>>> grid;   // 地图分区
         private int gridSize = 100;                 // 分区大小
-        private float[] pathRate = new float[] { 1.0f, 0.8f, 0.8f, 0.4f };
+        private float[] pathRate = new float[] { 1.0f, 1.0f, 0.2f };
         private int maxDegree;                      // 每个星系的最大路径
+        public int maxConnection = 6;
+        private double minDistance = 20.0;
 
 
         public Galaxy(int numStars, int width, int height)
@@ -74,11 +76,11 @@ namespace Galaxy
             int widthLimit = this.width / this.gridSize;
             int heightLimit = this.height / this.gridSize;
 
-            List<Star.Star> closestStars = new List<Star.Star>();
+            List<Star.Star> potentialClosestStars = new List<Star.Star>();
 
             int layer = 0;
 
-            while (closestStars.Count < n && layer < Math.Max(widthLimit, heightLimit))
+            while (layer < Math.Max(widthLimit, heightLimit))
             {
                 for (int x = xPos - layer; x <= xPos + layer; x++)
                 {
@@ -90,18 +92,24 @@ namespace Galaxy
                         foreach (Star.Star adjStar in this.grid[x][y])
                         {
                             if (adjStar == star) continue; // skip the input star
-                            closestStars.Add(adjStar);
+                            if (!potentialClosestStars.Contains(adjStar))
+                            {
+                                potentialClosestStars.Add(adjStar);
+                            }
                         }
-
-                        if (closestStars.Count >= n) break;
                     }
-                    if (closestStars.Count >= n) break;
                 }
                 layer++;
+
+                if (potentialClosestStars.Count >= n) break;
             }
 
-            return closestStars.OrderBy(s => Vector2.Distance(star.pos, s.pos)).Take(n).ToArray();
+            return potentialClosestStars
+                .OrderBy(s => Vector2.Distance(star.pos, s.pos))
+                .Take(n)
+                .ToArray();
         }
+
 
 
         /**
@@ -112,15 +120,45 @@ namespace Galaxy
             InitGrid();
 
             // 生成星系
-            for (int i = 0; i < numStars; i++)
+            for (int i = 0; i < numStars;)
             {
                 Vector2 pos = new Vector2(UnityEngine.Random.Range(0, width), UnityEngine.Random.Range(0, height));
                 int xPos = (int)(pos.x / this.gridSize);
                 int yPos = (int)(pos.y / this.gridSize);
-                Star.Star star = new Star.Star(i, pos, this.livableRate, this.blackholeRate);
-                this.stars.Add(star);
-                this.grid[xPos][yPos].Add(star);
+
+                bool isTooClose = false;
+
+                // Calculate the range of grid cells to check, considering the minDistance.
+                int offset = (int)Math.Ceiling(this.minDistance / this.gridSize);
+                int xStart = Math.Max(xPos - offset, 0);
+                int xEnd = Math.Min(xPos + offset, this.grid.Count - 1);  // using grid.Count since it represents the width in terms of grid cells
+                int yStart = Math.Max(yPos - offset, 0);
+                int yEnd = Math.Min(yPos + offset, this.grid[0].Count - 1); // assuming all rows have the same number of columns
+
+                for (int x = xStart; x <= xEnd && !isTooClose; x++)
+                {
+                    for (int y = yStart; y <= yEnd && !isTooClose; y++)
+                    {
+                        foreach (Star.Star existingStar in this.grid[x][y])
+                        {
+                            if (Vector2.Distance(pos, existingStar.pos) < this.minDistance)
+                            {
+                                isTooClose = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!isTooClose)
+                {
+                    Star.Star star = new Star.Star(i, pos, this.livableRate, this.blackholeRate);
+                    this.stars.Add(star);
+                    this.grid[xPos][yPos].Add(star);
+                    i++; // Only increment if we successfully placed a star
+                }
             }
+
 
             // 连接星系，生成路径
             foreach (Star.Star star in this.stars)
@@ -128,6 +166,11 @@ namespace Galaxy
                 Star.Star[] cloestStars = CloestStars(star, this.maxDegree);
                 for (int i = 0; i < this.maxDegree; i++)
                 {
+                    if (i > 0) 
+                    {
+                        if (star.adj.Count > this.maxDegree) { break; }
+                        if (cloestStars[i].adj.Count > this.maxDegree) { continue; }
+                    }
                     float randomNumber = UnityEngine.Random.Range(0f, 1f);
                     if (randomNumber < this.pathRate[i])
                     {
@@ -138,7 +181,7 @@ namespace Galaxy
             }
 
 
-            /**
+            
             // 使用并查集确保所有星系的连通性
             // 1. 初始化
             foreach (Star.Star star in this.stars)
@@ -164,55 +207,54 @@ namespace Galaxy
             while (representatives.Count > 1)
             {
                 Star.Star[] reps = representatives.ToArray();
-                Star.Star repA = reps[0];
-                Star.Star closestToRepA = null;
-                double minDistance = double.MaxValue;
 
-                List<Star.Star> toRemove = new List<Star.Star>();
-                List<Star.Star> toAdd = new List<Star.Star>();
+                // 创建一个列表来存储所有距离及其对应的星系对
+                List<Tuple<double, Star.Star, Star.Star>> distances = new List<Tuple<double, Star.Star, Star.Star>>();
 
-                foreach (Star.Star repB in reps)
+                // 对于每一对Union，计算它们之间的所有星系对的距离
+                foreach (Star.Star repA in reps)
                 {
-                    if (repA != repB)
+                    foreach (Star.Star repB in reps)
                     {
-                        foreach (Star.Star aMember in this.stars.Where(s => Find(s) == repA))
+                        if (Find(repA) != Find(repB))  // 确保它们属于不同的Union
                         {
-                            foreach (Star.Star bMember in this.stars.Where(s => Find(s) == repB))
+                            foreach (Star.Star aMember in this.stars.Where(s => Find(s) == repA))
                             {
-                                double distance = Vector2.Distance(aMember.pos, bMember.pos);
-                                if (distance < minDistance)
+                                foreach (Star.Star bMember in this.stars.Where(s => Find(s) == repB))
                                 {
-                                    closestToRepA = bMember;
-                                    minDistance = distance;
+                                    double distance = Vector2.Distance(aMember.pos, bMember.pos);
+                                    distances.Add(new Tuple<double, Star.Star, Star.Star>(distance, aMember, bMember));
                                 }
                             }
                         }
-
-                        if (closestToRepA != null)
-                        {
-                            this.paths.Add(new Path.Path(repA, closestToRepA));
-                            repA.adj.Add(closestToRepA);
-                            closestToRepA.adj.Add(repA);
-                            Union(repA, closestToRepA);
-                        }
-
-                        toRemove.Add(repA);
-                        toRemove.Add(closestToRepA);
-                        toAdd.Add(Find(repA));  // 重新加入新的代表
                     }
                 }
 
-                foreach (var item in toRemove)
+                // 对距离进行排序并选择maxConnection个最小的距离
+                var sortedDistances = distances.OrderBy(tuple => tuple.Item1).Take(this.maxConnection).ToList();
+
+                // 如果没有找到可以连接的星系，则退出循环
+                if (sortedDistances.Count == 0)
                 {
-                    representatives.Remove(item);
+                    break;
                 }
 
-                foreach (var item in toAdd)
+                foreach (var tuple in sortedDistances)
                 {
-                    representatives.Add(item);
+                    Path.Path newPath = new Path.Path(tuple.Item2, tuple.Item3);
+                    newPath.unionPath = true;
+                    this.paths.Add(newPath);
+                    tuple.Item2.adj.Add(tuple.Item3);
+                    tuple.Item3.adj.Add(tuple.Item2);
+
+                    Union(tuple.Item2, tuple.Item3);
+
+                    representatives.Remove(Find(tuple.Item2));
+                    representatives.Remove(Find(tuple.Item3));
+                    representatives.Add(Find(tuple.Item2));
                 }
             }
-            */
+
         }
 
 

@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject starprefab;
     public GameObject pathprefab;
+    public GameObject unionpathprefab;
 
     // Start is called before the first frame update
     void Start()
@@ -39,7 +40,7 @@ public class GameManager : MonoBehaviour
         Debug.Log(map.paths.Count);
         this.map = map;
         CreateGameObject();
-        rander();
+        //rander();
     }
 
     // Update is called once per frame
@@ -52,15 +53,13 @@ public class GameManager : MonoBehaviour
     private void CreateGameObject()
     {
         foreach (Star.Star star in this.map.stars)
-        {
-            GameObject newStar = CreateGameObjectFromstar(star);
-            renderedStar.Add(newStar);
+        {          
+            renderedStar.Add(CreateGameObjectFromstar(star));
         }
 
         foreach (Path.Path path in this.map.paths)
         {
-            GameObject newPath = CreateGameObjectFromPath(path);
-            renderedStar.Add(newPath);
+            renderedStar.Add(CreateGameObjectFromPath(path));
         }
     }
 
@@ -80,27 +79,22 @@ public class GameManager : MonoBehaviour
         float angleDeg = angleRad * Mathf.Rad2Deg;
 
         // 实例化预制体
-        GameObject rectangleObj = Instantiate(pathprefab);
+        GameObject rectangleObj = Instantiate(path.unionPath ? unionpathprefab : pathprefab);
 
         // 设定名字
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
         rectangleObj.name = rectangleName;
 
-        RectTransform rectTransform = rectangleObj.GetComponent<RectTransform>();
+        // 设定位置和旋转
+        rectangleObj.transform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
+        rectangleObj.transform.rotation = Quaternion.Euler(0, 0, angleDeg);
 
-        if (rectTransform != null)
-        {
-            rectTransform.sizeDelta = new Vector2(length, 0.5f); // Assuming a width of 0.5, adjust as needed
-            rectTransform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
-            rectTransform.rotation = Quaternion.Euler(0, 0, angleDeg);
-        }
-        else
-        {
-            Debug.LogError($"No RectTransform on prefab for path {rectangleName}");
-        }
+        // 设定大小
+        rectangleObj.transform.localScale = new Vector3(length, 1, 1);
 
         return rectangleObj;
     }
+
 
 
     private GameObject CreateGameObjectFromstar(Star.Star star)
