@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(this.map.stars.Count);
+
     }
 
     // TODO: 将map里的星系以及路径生成成对应的gameobject
@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
 
     private GameObject CreateGameObjectFromstar(Star.Star star)
     {
-        Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, 0f);
+        Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, -0.2f);
         GameObject newStar = Instantiate(starprefab, starPosition, Quaternion.identity);
         newStar.name = star.id.ToString();
         newStar.layer = star.type;
@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviour
         }
         foreach (GameObject newPath in renderedPath)
         {
-            Instantiate(pathprefab, newPath.transform.position, Quaternion.identity);
+            Instantiate(pathprefab, new Vector3(newPath.transform.position.x, newPath.transform.position.y, -0.2f), Quaternion.identity);
         }
     }
 }

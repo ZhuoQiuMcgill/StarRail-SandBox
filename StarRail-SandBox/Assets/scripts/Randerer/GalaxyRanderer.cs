@@ -16,7 +16,6 @@ public class GalaxyRanderer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("123");
         //GenerateMap();
         //Galaxy.Galaxy galaxy = new Galaxy.Galaxy(2500, 10000, 5000);
         //galaxy.GenerateStarsAndPaths();
