@@ -28,8 +28,8 @@ namespace Galaxy
         private int gridSize = 100;                 // 分区大小
         private float[] pathRate = new float[] { 1.0f, 1.0f, 0.2f };
         private int maxDegree;                      // 每个星系的最大路径
-        private int maxConnection = 10;
-        private double minDistance = 30.0;
+        private int maxConnection = 10;             // 两个union之间最大连接数
+        private double minDistance = 30.0;          // 两个星系之间最短距离
 
 
         public Galaxy(int numStars, int width, int height)

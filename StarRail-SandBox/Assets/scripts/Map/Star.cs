@@ -8,11 +8,11 @@ namespace Star
     public class Star
     {
         public int id { get; }
-        public int type { get; set; }
-        public Vector2 pos { get; set; }
-        public bool isLivable = false;
-        public bool isDestroyed = false;
-        public List<Star> adj { get; set; }
+        public int type { get; set; }           // 0为资源型星系；1为黑洞
+        public Vector2 pos { get; set; }        // 位置信息
+        public bool isLivable = false;          // 是否宜居
+        public bool isDestroyed = false;        // 是否被摧毁
+        public List<Star> adj { get; set; }     // 记录相邻的星系
 
         // 资源数值
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
@@ -52,6 +52,10 @@ namespace Star
             fillResources();
         }
 
+
+        /**
+         * 给一个星系填充资源
+         */
         public void fillResources()
         {
             if (this.type == 1)
@@ -70,7 +74,9 @@ namespace Star
             }
         }
 
-
+        /**
+         * 摧毁星系时使用这个Method，返回摧毁后获得的资源数值以及清空该星系资源生成
+         */
         public Dictionary<MapResources.Resources, int> destroy()
         {
             this.isLivable = false;
