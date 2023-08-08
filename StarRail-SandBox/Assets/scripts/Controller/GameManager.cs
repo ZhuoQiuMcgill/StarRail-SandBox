@@ -12,32 +12,48 @@ public class GameManager : MonoBehaviour
     public int numStars = 1000;
 
     private Galaxy.Galaxy map;
+    //转录为GameObject list
+    private List<GameObject> renderedStar = new List<GameObject>();
+    private List<GameObject> renderedPath = new List<GameObject>();
 
+    public GameObject starprefab;
+    public GameObject pathprefab;
 
     // Start is called before the first frame update
     void Start()
     {
         // 创建地图
+        Debug.Log("Before Map Create");
         Galaxy.Galaxy map = new Galaxy.Galaxy(this.numStars, this.width, this.height);
+        Debug.Log("Map create successed");
         this.map = map;
         CreateGameObject();
         rander();
-
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        // Debug.Log(this.map.stars.Count);
     }
 
     // TODO: 将map里的星系以及路径生成成对应的gameobject
     private void CreateGameObject()
     {
+        foreach (Star.Star star in this.map.stars)
+        {
+            GameObject newStar = CreateGameObjectFromstar(star);
+            renderedStar.Add(newStar);
+        }
 
+        foreach (Path.Path path in this.map.paths)
+        {
+            GameObject newPath = CreateGameObjectFrompath(path);
+            renderedStar.Add(newPath);
+        }
     }
 
-    private GameObject PathToRect(Path path)
+    private GameObject CreateGameObjectFrompath(Path.Path path)
     {
         Vector2 pos1 = path.star1.pos;
         Vector2 pos2 = path.star2.pos;
@@ -61,31 +77,34 @@ public class GameManager : MonoBehaviour
         float width = 0.5f;
 
         rectTransform.sizeDelta = new Vector2(length, width);
-        rectTransform.position = midpoint;
+        rectTransform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
         rectTransform.rotation = Quaternion.Euler(0, 0, angleDeg);
 
-        // 添加一个图像组件并设置其颜色
-        var imageComponent = rectangleObj.AddComponent<Image>();
-        imageComponent.color = Color.white;
 
         return rectangleObj;
+    }
+
+    private GameObject CreateGameObjectFromstar(Star.Star star)
+    {
+        Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, -0.2f);
+        GameObject newStar = Instantiate(starprefab, starPosition, Quaternion.identity);
+        newStar.name = star.id.ToString();
+        newStar.layer = star.type;
+        newStar.isStatic = star.isLivable;
+        newStar.isStatic = star.isDestroyed;
+        return newStar;
     }
 
     // TODO: 将已经生产的gameobject渲染至画面
     private void rander()
     {
-
-    }
-
-    private GameObject CreateGameObjectFromstar(Star.Star star)
-    {
-        GameObject newGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        return newGameObject;
-    }
-
-    private GameObject CreateGameObjectFrompath(Path.Path path)
-    {
-        GameObject newGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        return newGameObject;
+        foreach (GameObject newStar in renderedStar)
+        {
+            Instantiate(starprefab, newStar.transform.position, Quaternion.identity);            
+        }
+        foreach (GameObject newPath in renderedPath)
+        {
+            Instantiate(pathprefab, newPath.transform.position, Quaternion.identity);
+        }
     }
 }

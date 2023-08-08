@@ -166,7 +166,10 @@ namespace Galaxy
                 Star.Star closestToRepA = null;
                 double minDistance = double.MaxValue;
 
-                foreach (Star.Star repB in representatives)
+                List<Star.Star> toRemove = new List<Star.Star>();
+                List<Star.Star> toAdd = new List<Star.Star>();
+
+                foreach (Star.Star repB in reps)
                 {
                     if (repA != repB)
                     {
@@ -191,10 +194,20 @@ namespace Galaxy
                             Union(repA, closestToRepA);
                         }
 
-                        representatives.Remove(repA);
-                        representatives.Remove(closestToRepA);
-                        representatives.Add(Find(repA));  // 重新加入新的代表
+                        toRemove.Add(repA);
+                        toRemove.Add(closestToRepA);
+                        toAdd.Add(Find(repA));  // 重新加入新的代表
                     }
+                }
+
+                foreach (var item in toRemove)
+                {
+                    representatives.Remove(item);
+                }
+
+                foreach (var item in toAdd)
+                {
+                    representatives.Add(item);
                 }
             }
         }
