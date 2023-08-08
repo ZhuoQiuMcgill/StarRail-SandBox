@@ -28,8 +28,8 @@ namespace Galaxy
         private int gridSize = 100;                 // 分区大小
         private float[] pathRate = new float[] { 1.0f, 1.0f, 0.2f };
         private int maxDegree;                      // 每个星系的最大路径
-        public int maxConnection = 6;
-        private double minDistance = 20.0;
+        private int maxConnection = 10;
+        private double minDistance = 30.0;
 
 
         public Galaxy(int numStars, int width, int height)
@@ -122,7 +122,11 @@ namespace Galaxy
             // 生成星系
             for (int i = 0; i < numStars;)
             {
-                Vector2 pos = new Vector2(UnityEngine.Random.Range(0, width), UnityEngine.Random.Range(0, height));
+                float radius = height / 2.0f;
+                float angle = UnityEngine.Random.Range(0, 2 * Mathf.PI);
+                float distanceFromCenter = Mathf.Sqrt(UnityEngine.Random.Range(0, radius * radius)); // 使用平方根函数保证随机分布是均匀的
+                Vector2 pos = new Vector2(radius + distanceFromCenter * Mathf.Cos(angle), radius + distanceFromCenter * Mathf.Sin(angle));
+
                 int xPos = (int)(pos.x / this.gridSize);
                 int yPos = (int)(pos.y / this.gridSize);
 
@@ -131,9 +135,9 @@ namespace Galaxy
                 // Calculate the range of grid cells to check, considering the minDistance.
                 int offset = (int)Math.Ceiling(this.minDistance / this.gridSize);
                 int xStart = Math.Max(xPos - offset, 0);
-                int xEnd = Math.Min(xPos + offset, this.grid.Count - 1);  // using grid.Count since it represents the width in terms of grid cells
+                int xEnd = Math.Min(xPos + offset, this.grid.Count - 1);
                 int yStart = Math.Max(yPos - offset, 0);
-                int yEnd = Math.Min(yPos + offset, this.grid[0].Count - 1); // assuming all rows have the same number of columns
+                int yEnd = Math.Min(yPos + offset, this.grid[0].Count - 1);
 
                 for (int x = xStart; x <= xEnd && !isTooClose; x++)
                 {
@@ -158,6 +162,7 @@ namespace Galaxy
                     i++; // Only increment if we successfully placed a star
                 }
             }
+
 
 
             // 连接星系，生成路径
