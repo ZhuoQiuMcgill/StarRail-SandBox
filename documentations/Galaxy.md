@@ -1,6 +1,16 @@
 # Galaxy 类
 
-Galaxy 类代表一个包含多个星体及其路径的星系。
+`Galaxy` 类代表一个包含多个星体及其路径的星系。
+
+
+## 导入的库
+- `System.Collections`
+- `System.Collections.Generic`
+- `UnityEngine`
+- `System`
+- `System.Linq`
+- `Path`
+- `Star`
 
 ## 属性
 
