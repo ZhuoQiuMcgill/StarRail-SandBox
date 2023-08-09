@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     // UI×é¼þ
     public TMP_Text starResourcesText;
+    public TMP_Text gameObjectUIText;
 
     // Start is called before the first frame update
     void Start()
@@ -75,6 +76,7 @@ public class GameManager : MonoBehaviour
                 {
                     Debug.Log("Clicked on a Star: " + starData.star.id + " resources: \n" + starData.ResourcesInfo());
                     starResourcesText.text = starData.ResourcesInfo();
+                    gameObjectUIText.text = "Star: " + hit.collider.gameObject.name;
                 }
 
             }
@@ -84,8 +86,14 @@ public class GameManager : MonoBehaviour
             {
                 PathData pathData = hit.collider.gameObject.GetComponent<PathData>();
                 Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name + "\tspeed rate: " + pathData.path.speedRate);
+                starResourcesText.text = "";
+                gameObjectUIText.text = "Path: " + hit.collider.gameObject.name;
             }
 
+        }
+        else { 
+            starResourcesText.text = "";
+            gameObjectUIText.text = "";
         }
     }
 
