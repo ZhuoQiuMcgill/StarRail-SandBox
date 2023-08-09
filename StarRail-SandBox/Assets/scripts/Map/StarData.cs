@@ -1,16 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Star;
-using MapResources;
+using MapElement;
 using System.Text;
 
 
 public class StarData : MonoBehaviour
 {
-    public Star.Star star;
+    public MapElement.Star star;
 
-    public void Initialize(Star.Star star)
+    public void Initialize(MapElement.Star star)
     {  
         this.star = star;
     }
