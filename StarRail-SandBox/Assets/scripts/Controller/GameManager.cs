@@ -56,13 +56,14 @@ public class GameManager : MonoBehaviour
                     StarData starData = hit.collider.gameObject.GetComponent<StarData>();
                     if (starData != null)
                     {
-                        Debug.Log("Clicked on a Star: " + starData.id + " resources: \n" + starData.ResourcesInfo());
+                        Debug.Log("Clicked on a Star: " + starData.star.id + " resources: \n" + starData.ResourcesInfo());
                     }
                     
                 }
                 else if (hit.collider.CompareTag("Path"))
                 {
-                    Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name);
+                    PathData pathData = hit.collider.gameObject.GetComponent<PathData>();
+                    Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name + "\tspeed rate: " + pathData.path.speedRate);
                 }
                 
             }
@@ -106,6 +107,8 @@ public class GameManager : MonoBehaviour
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
         rectangleObj.name = rectangleName;
         rectangleObj.tag = "Path";
+        PathData pathData = rectangleObj.AddComponent<PathData>();
+        pathData.Initialize(path);
 
         // 设定位置和旋转
         rectangleObj.transform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
