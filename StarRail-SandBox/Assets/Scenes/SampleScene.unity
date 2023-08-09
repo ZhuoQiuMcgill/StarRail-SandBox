@@ -331,7 +331,6 @@ GameObject:
   m_Component:
   - component: {fileID: 767891325}
   - component: {fileID: 767891324}
-  - component: {fileID: 767891326}
   m_Layer: 0
   m_Name: MapRanderer
   m_TagString: Untagged
@@ -406,18 +405,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 330885598}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &767891326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 767891322}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9de56476203454493afb0d500cc174, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &820417347
 GameObject:
   m_ObjectHideFlags: 0
