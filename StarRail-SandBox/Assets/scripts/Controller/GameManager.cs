@@ -12,8 +12,12 @@ public class GameManager : MonoBehaviour
 
     private MapElement.Galaxy map;
     
-    private List<GameObject> renderedStar = new List<GameObject>();
+    private List<GameObject> resourcesStars = new List<GameObject>();
+    private List<GameObject> livableStars = new List<GameObject>();
+    private List<GameObject> blackholes = new List<GameObject>();
+
     private List<GameObject> renderedPath = new List<GameObject>();
+
 
     public GameObject starPrefab;
     public GameObject livableStarPrefab;
@@ -30,40 +34,53 @@ public class GameManager : MonoBehaviour
         this.map = map;
 
         CreateGameObject();
-       
+        Debug.Log("Resources Stars: " + this.resourcesStars.Count);
+        Debug.Log("Livable Stars: " + this.livableStars.Count);
+        Debug.Log("Blackhole: " + this.blackholes.Count);
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
         // 检查是否按下鼠标左键
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0)) { mouseLeftClickAction(); }
+        
+    }
+
+
+    /**
+     * 鼠标左键函数
+     */
+    private void mouseLeftClickAction()
+    {
+        // 转换鼠标位置到世界坐标
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        // 从鼠标位置发射一条射线
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+        if (hit.collider != null)
         {
-            // 转换鼠标位置到世界坐标
-            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            // 从鼠标位置发射一条射线
-            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-
-            // 如果射线击中了一个物体，并且物体的标签是"Star"
-            if (hit.collider != null)
+            // 鼠标击中星系
+            if (hit.collider.CompareTag("Star"))
             {
-                if (hit.collider.CompareTag("Star"))
+                StarData starData = hit.collider.gameObject.GetComponent<StarData>();
+                if (starData != null)
                 {
-                    StarData starData = hit.collider.gameObject.GetComponent<StarData>();
-                    if (starData != null)
-                    {
-                        Debug.Log("Clicked on a Star: " + starData.star.id + " resources: \n" + starData.ResourcesInfo());
-                    }
-                    
+                    Debug.Log("Clicked on a Star: " + starData.star.id + " resources: \n" + starData.ResourcesInfo());
                 }
-                else if (hit.collider.CompareTag("Path"))
-                {
-                    PathData pathData = hit.collider.gameObject.GetComponent<PathData>();
-                    Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name + "\tspeed rate: " + pathData.path.speedRate);
-                }
-                
+
             }
+
+            // 鼠标击中路径
+            else if (hit.collider.CompareTag("Path"))
+            {
+                PathData pathData = hit.collider.gameObject.GetComponent<PathData>();
+                Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name + "\tspeed rate: " + pathData.path.speedRate);
+            }
+
         }
     }
 
@@ -73,12 +90,17 @@ public class GameManager : MonoBehaviour
     {
         foreach (MapElement.Star star in this.map.stars)
         {          
-            renderedStar.Add(CreateGameObjectFromStar(star));
+            if (star.type == 1) { this.blackholes.Add(CreateGameObjectFromStar(star)); }
+            else
+            {
+                if (star.isLivable) { this.livableStars.Add(CreateGameObjectFromStar(star)); }
+                else { this.resourcesStars.Add(CreateGameObjectFromStar(star)); }
+            }
         }
 
         foreach (MapElement.Path path in this.map.paths)
         {
-            renderedStar.Add(CreateGameObjectFromPath(path));
+            renderedPath.Add(CreateGameObjectFromPath(path));
         }
     }
 
@@ -103,7 +125,15 @@ public class GameManager : MonoBehaviour
         // 设定名字
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
         rectangleObj.name = rectangleName;
+
+        // 添加tag
         rectangleObj.tag = "Path";
+
+        // 设定父级
+        Transform parent = GameObject.Find("Map/Paths").transform;
+        rectangleObj.transform.SetParent(parent);
+
+        // 添加PathData组件并初始化数据
         PathData pathData = rectangleObj.AddComponent<PathData>();
         pathData.Initialize(path);
 
@@ -114,8 +144,6 @@ public class GameManager : MonoBehaviour
         // 设定大小
         rectangleObj.transform.localScale = new Vector3(length, 1, 1);
 
-        // Debug.Log(rectangleName + ": " + path.distance);
-
         return rectangleObj;
     }
 
@@ -123,15 +151,30 @@ public class GameManager : MonoBehaviour
     {
         Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, -0.5f);
         GameObject prefab;
+        Transform parent;
 
-        if (star.type == 1) { prefab = this.blackholePrefab; }
+        // 分类设定渲染物以及父级
+        if (star.type == 1) 
+        { 
+            prefab = this.blackholePrefab;
+            parent = GameObject.Find("Map/Stars/Blackhole").transform;
+        }
         else
         {
-            if (star.isLivable) { prefab = this.livableStarPrefab; }
-            else { prefab = this.starPrefab; }
+            if (star.isLivable) 
+            { 
+                prefab = this.livableStarPrefab;
+                parent = GameObject.Find("Map/Stars/LivableStars").transform;
+            }
+            else 
+            { 
+                prefab = this.starPrefab;
+                parent = GameObject.Find("Map/Stars/ResourcesStars").transform;
+            }
         }
 
-        GameObject newStar = Instantiate(prefab, starPosition, Quaternion.identity);
+
+        GameObject newStar = Instantiate(prefab, starPosition, Quaternion.identity, parent);
         newStar.name = star.id.ToString();
 
         // 为新的星星GameObject设置标签
