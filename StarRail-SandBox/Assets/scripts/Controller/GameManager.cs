@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public int numStars = 100;
 
     private MapElement.Galaxy map;
-    //转录为GameObject list
+    
     private List<GameObject> renderedStar = new List<GameObject>();
     private List<GameObject> renderedPath = new List<GameObject>();
 
@@ -24,9 +24,9 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
         // 创建地图
-        Galaxy.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
+        MapElement.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
         this.map = map;
 
         CreateGameObject();

@@ -73,7 +73,7 @@ namespace MapElement
             int widthLimit = this.width / this.gridSize;
             int heightLimit = this.height / this.gridSize;
 
-            List<Star> potentialClosestStars = new List<Star.Star>();
+            List<Star> potentialClosestStars = new List<Star>();
 
             int layer = 0;
 
