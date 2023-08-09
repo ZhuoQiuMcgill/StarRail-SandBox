@@ -25,9 +25,9 @@ namespace Star
             };
 
         
-        private int resTick = 1000;     // 摧毁星系时可获取多少个tick的资源
-        private int maxResValue = 21;   // 最大资源数值
-        private int minResValue = 5;    // 最小资源数值
+        public int resTick = 1000;     // 摧毁星系时可获取多少个tick的资源
+        public int maxResValue = 21;   // 最大资源数值
+        public int minResValue = 5;    // 最小资源数值
 
 
         public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
