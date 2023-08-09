@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Galaxy;
-using Star;
-using Path;
+using MapElement;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -11,12 +10,10 @@ public class GameManager : MonoBehaviour
     public int height = 500;
     public int numStars = 100;
 
-    private Galaxy.Galaxy map;
+    private MapElement.Galaxy map;
     //转录为GameObject list
     private List<GameObject> renderedStar = new List<GameObject>();
     private List<GameObject> renderedPath = new List<GameObject>();
-
-    private Dictionary<GameObject, Star.Star> starDict = new Dictionary<GameObject, Star.Star>();
 
     public GameObject starPrefab;
     public GameObject livableStarPrefab;
@@ -29,7 +26,7 @@ public class GameManager : MonoBehaviour
     {
         
         // 创建地图
-        Galaxy.Galaxy map = new Galaxy.Galaxy(this.numStars, this.width, this.height);
+        Galaxy.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
         this.map = map;
 
         CreateGameObject();
@@ -56,13 +53,14 @@ public class GameManager : MonoBehaviour
                     StarData starData = hit.collider.gameObject.GetComponent<StarData>();
                     if (starData != null)
                     {
-                        Debug.Log("Clicked on a Star: " + starData.id + " resources: \n" + starData.ResourcesInfo());
+                        Debug.Log("Clicked on a Star: " + starData.star.id + " resources: \n" + starData.ResourcesInfo());
                     }
                     
                 }
                 else if (hit.collider.CompareTag("Path"))
                 {
-                    Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name);
+                    PathData pathData = hit.collider.gameObject.GetComponent<PathData>();
+                    Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name + "\tspeed rate: " + pathData.path.speedRate);
                 }
                 
             }
@@ -73,18 +71,18 @@ public class GameManager : MonoBehaviour
     // TODO: 将map里的星系以及路径生成成对应的gameobject
     private void CreateGameObject()
     {
-        foreach (Star.Star star in this.map.stars)
+        foreach (MapElement.Star star in this.map.stars)
         {          
             renderedStar.Add(CreateGameObjectFromStar(star));
         }
 
-        foreach (Path.Path path in this.map.paths)
+        foreach (MapElement.Path path in this.map.paths)
         {
             renderedStar.Add(CreateGameObjectFromPath(path));
         }
     }
 
-    private GameObject CreateGameObjectFromPath(Path.Path path)
+    private GameObject CreateGameObjectFromPath(MapElement.Path path)
     {
         Vector2 pos1 = path.star1.pos;
         Vector2 pos2 = path.star2.pos;
@@ -106,6 +104,8 @@ public class GameManager : MonoBehaviour
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
         rectangleObj.name = rectangleName;
         rectangleObj.tag = "Path";
+        PathData pathData = rectangleObj.AddComponent<PathData>();
+        pathData.Initialize(path);
 
         // 设定位置和旋转
         rectangleObj.transform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour
         return rectangleObj;
     }
 
-    private GameObject CreateGameObjectFromStar(Star.Star star)
+    private GameObject CreateGameObjectFromStar(MapElement.Star star)
     {
         Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, -0.5f);
         GameObject prefab;

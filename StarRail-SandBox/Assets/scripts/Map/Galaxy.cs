@@ -5,10 +5,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 
-using Path;
-using Star;
-
-namespace Galaxy
+namespace MapElement
 {
     public class Galaxy
     {
@@ -16,15 +13,15 @@ namespace Galaxy
         public int width;
         public int height;
 
-        public List<Star.Star> stars { get; } = new List<Star.Star>();
-        public List<Path.Path> paths { get; } = new List<Path.Path>();
+        public List<Star> stars { get; } = new List<Star>();
+        public List<Path> paths { get; } = new List<Path>();
 
-        private Dictionary<Star.Star, Star.Star> parent = new Dictionary<Star.Star, Star.Star>();
-        private Dictionary<Star.Star, int> rank = new Dictionary<Star.Star, int>();
+        private Dictionary<Star, Star> parent = new Dictionary<Star, Star>();
+        private Dictionary<Star, int> rank = new Dictionary<Star, int>();
 
         private double livableRate = 0.2;           // 生成宜居星系的概率
         private double blackholeRate = 0.05;        // 生成黑洞星系的概率
-        private List<List<List<Star.Star>>> grid;   // 地图分区
+        private List<List<List<Star>>> grid;   // 地图分区
         private int gridSize = 100;                 // 分区大小
         private float[] pathRate = new float[] { 1.0f, 1.0f, 0.2f };
         private int maxDegree;                      // 每个星系的最大路径
@@ -51,14 +48,14 @@ namespace Galaxy
             int yPos = this.height / this.gridSize;
 
             // 初始化前两维
-            grid = new List<List<List<Star.Star>>>();
+            grid = new List<List<List<Star>>>();
             for (int i = 0; i < xPos; i++)
             {
-                List<List<Star.Star>> twoDimensionalList = new List<List<Star.Star>>();
+                List<List<Star>> twoDimensionalList = new List<List<Star>>();
                 for (int j = 0; j < yPos; j++)
                 {
                     // 对第三维进行空初始化，只有在需要时才添加元素
-                    twoDimensionalList.Add(new List<Star.Star>());
+                    twoDimensionalList.Add(new List<Star>());
                 }
                 grid.Add(twoDimensionalList);
             }
@@ -67,7 +64,7 @@ namespace Galaxy
         /** 
          * 这个method会寻找距离star最近的n个星系并返回
          */
-        public Star.Star[] CloestStars(Star.Star star, int n)
+        public Star[] CloestStars(Star star, int n)
         {
             Vector2 starPos = star.pos;
             int xPos = (int)(starPos.x / this.gridSize);
@@ -76,7 +73,7 @@ namespace Galaxy
             int widthLimit = this.width / this.gridSize;
             int heightLimit = this.height / this.gridSize;
 
-            List<Star.Star> potentialClosestStars = new List<Star.Star>();
+            List<Star> potentialClosestStars = new List<Star.Star>();
 
             int layer = 0;
 
@@ -89,7 +86,7 @@ namespace Galaxy
                         if (x < 0 || x >= widthLimit || y < 0 || y >= heightLimit) continue;
                         if (x > xPos - layer && x < xPos + layer && y > yPos - layer && y < yPos + layer) continue;
 
-                        foreach (Star.Star adjStar in this.grid[x][y])
+                        foreach (Star adjStar in this.grid[x][y])
                         {
                             if (adjStar == star) continue; // skip the input star
                             if (!potentialClosestStars.Contains(adjStar))
@@ -143,7 +140,7 @@ namespace Galaxy
                 {
                     for (int y = yStart; y <= yEnd && !isTooClose; y++)
                     {
-                        foreach (Star.Star existingStar in this.grid[x][y])
+                        foreach (Star existingStar in this.grid[x][y])
                         {
                             if (Vector2.Distance(pos, existingStar.pos) < this.minDistance)
                             {
@@ -156,7 +153,7 @@ namespace Galaxy
 
                 if (!isTooClose)
                 {
-                    Star.Star star = new Star.Star(i, pos, this.livableRate, this.blackholeRate);
+                    Star star = new Star(i, pos, this.livableRate, this.blackholeRate);
                     this.stars.Add(star);
                     this.grid[xPos][yPos].Add(star);
                     i++; // Only increment if we successfully placed a star
@@ -166,9 +163,9 @@ namespace Galaxy
 
 
             // 连接星系，生成路径
-            foreach (Star.Star star in this.stars)
+            foreach (Star star in this.stars)
             {
-                Star.Star[] cloestStars = CloestStars(star, this.maxDegree);
+                Star[] cloestStars = CloestStars(star, this.maxDegree);
                 for (int i = 0; i < this.maxDegree; i++)
                 {
                     if (i > 0) 
@@ -179,7 +176,7 @@ namespace Galaxy
                     float randomNumber = UnityEngine.Random.Range(0f, 1f);
                     if (randomNumber < this.pathRate[i])
                     {
-                        this.paths.Add(new Path.Path(star, cloestStars[i]));
+                        this.paths.Add(new Path(star, cloestStars[i]));
                         star.adj.Add(cloestStars[i]);
                     }
                 }
@@ -189,21 +186,21 @@ namespace Galaxy
             
             // 使用并查集确保所有星系的连通性
             // 1. 初始化
-            foreach (Star.Star star in this.stars)
+            foreach (Star star in this.stars)
             {
                 parent[star] = star;
                 rank[star] = 0;
             }
 
             // 2. 使用Union合并
-            foreach (Path.Path path in this.paths)
+            foreach (Path path in this.paths)
             {
                 Union(path.star1, path.star2);
             }
 
             // 3. 找出所有的代表星系
-            HashSet<Star.Star> representatives = new HashSet<Star.Star>();
-            foreach (Star.Star star in this.stars)
+            HashSet<Star> representatives = new HashSet<Star>();
+            foreach (Star star in this.stars)
             {
                 representatives.Add(Find(star));
             }
@@ -211,24 +208,24 @@ namespace Galaxy
             // 4. 为每对独立的代表星系添加最短路径
             while (representatives.Count > 1)
             {
-                Star.Star[] reps = representatives.ToArray();
+                Star[] reps = representatives.ToArray();
 
                 // 创建一个列表来存储所有距离及其对应的星系对
-                List<Tuple<double, Star.Star, Star.Star>> distances = new List<Tuple<double, Star.Star, Star.Star>>();
+                List<Tuple<double, Star, Star>> distances = new List<Tuple<double, Star, Star>>();
 
                 // 对于每一对Union，计算它们之间的所有星系对的距离
-                foreach (Star.Star repA in reps)
+                foreach (Star repA in reps)
                 {
-                    foreach (Star.Star repB in reps)
+                    foreach (Star repB in reps)
                     {
                         if (Find(repA) != Find(repB))  // 确保它们属于不同的Union
                         {
-                            foreach (Star.Star aMember in this.stars.Where(s => Find(s) == repA))
+                            foreach (Star aMember in this.stars.Where(s => Find(s) == repA))
                             {
-                                foreach (Star.Star bMember in this.stars.Where(s => Find(s) == repB))
+                                foreach (Star bMember in this.stars.Where(s => Find(s) == repB))
                                 {
                                     double distance = Vector2.Distance(aMember.pos, bMember.pos);
-                                    distances.Add(new Tuple<double, Star.Star, Star.Star>(distance, aMember, bMember));
+                                    distances.Add(new Tuple<double, Star, Star>(distance, aMember, bMember));
                                 }
                             }
                         }
@@ -246,7 +243,7 @@ namespace Galaxy
 
                 foreach (var tuple in sortedDistances)
                 {
-                    Path.Path newPath = new Path.Path(tuple.Item2, tuple.Item3);
+                    Path newPath = new Path(tuple.Item2, tuple.Item3);
                     newPath.unionPath = true;
                     this.paths.Add(newPath);
                     tuple.Item2.adj.Add(tuple.Item3);
@@ -265,7 +262,7 @@ namespace Galaxy
 
 
 
-        private Star.Star Find(Star.Star star)
+        private Star Find(Star star)
         {
             if (parent[star] != star)
             {
@@ -274,10 +271,10 @@ namespace Galaxy
             return parent[star];
         }
 
-        private void Union(Star.Star star1, Star.Star star2)
+        private void Union(Star star1, Star star2)
         {
-            Star.Star root1 = Find(star1);
-            Star.Star root2 = Find(star2);
+            Star root1 = Find(star1);
+            Star root2 = Find(star2);
 
             // Union by rank
             if (root1 != root2)
