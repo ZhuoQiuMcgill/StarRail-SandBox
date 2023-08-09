@@ -20,15 +20,15 @@ namespace MapResources
             switch (resource)
             {
                 case Resources.Population:
-                    return "人口";
+                    return "POP";
                 case Resources.Food:
-                    return "食物";
+                    return "FOD";
                 case Resources.Metal:
-                    return "金属";
+                    return "MET";
                 case Resources.Energy:
-                    return "能量";
+                    return "ENR";
                 case Resources.Technology:
-                    return "技术";
+                    return "TEC";
                 default:
                     return resource.ToString();
             }

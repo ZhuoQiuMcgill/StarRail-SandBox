@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using MapElement;
 
 
@@ -24,6 +25,9 @@ public class GameManager : MonoBehaviour
     public GameObject blackholePrefab;
     public GameObject pathPrefab;
     public GameObject unionPathPrefab;
+
+    // UI×é¼þ
+    public TMP_Text starResourcesText;
 
     // Start is called before the first frame update
     void Start()
@@ -70,6 +74,7 @@ public class GameManager : MonoBehaviour
                 if (starData != null)
                 {
                     Debug.Log("Clicked on a Star: " + starData.star.id + " resources: \n" + starData.ResourcesInfo());
+                    starResourcesText.text = starData.ResourcesInfo();
                 }
 
             }
