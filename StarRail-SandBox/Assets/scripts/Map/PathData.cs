@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Path;
+using MapElement;
 
 public class PathData : MonoBehaviour
 {
-    public Path.Path path;
+    public MapElement.Path path;
 
-    public void Initialize(Path.Path path)
+    public void Initialize(MapElement.Path path)
     {
         this.path = path;
     }

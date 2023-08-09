@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MapResources; 
 
-namespace Star
+namespace MapElement
 {
     public class Star
     {
