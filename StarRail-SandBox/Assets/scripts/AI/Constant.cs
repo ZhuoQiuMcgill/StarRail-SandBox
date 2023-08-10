@@ -23,6 +23,11 @@ namespace Constant
         public const int spaceStationBuildingTime = 5;
         public const int barracksBuildingTime = 5;
 
+        //±øÖÖÊıÖµ
+        public const int defaultMinionATK = 10;
+        public const int defaultMinionDEF = 10;
+
+
         public static int DamageCalculation(int ATK, int DEF)
         {
             return ATK - DEF;
