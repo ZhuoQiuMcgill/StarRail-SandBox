@@ -29,6 +29,9 @@ namespace MapElement
         public int maxResValue = 21;   // 最大资源数值
         public int minResValue = 5;    // 最小资源数值
 
+        //星系在派系中的重要程度
+        public int priority { get; }
+
 
         public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
         {
