@@ -12,6 +12,7 @@ public class AITemplate : MonoBehaviour
     public List<MapElement.Star> ownedStars { get; } = new List<MapElement.Star>();
     public List<Emanator.Emanator> emanators = new List<Emanator.Emanator>();
     public List<Warrior.WarriorGroup> warriors = new List<Warrior.WarriorGroup>();
+    public List<MapElement.Star> viewedStars { get; }
     
 
     private float aggressivity = 0.4f;
@@ -24,11 +25,12 @@ public class AITemplate : MonoBehaviour
     private int foodWeight = 0;
 
     //视野范围
-    private int vision = 150;
+    private float vision = 150.0f;
 
+    //生产士兵
     public void createWarriors (MapElement.Star star, int num)
     {
-        foreach (Warrior.WarriorGroup g in this.warriors) 
+        foreach (Warrior.WarriorGroup g in this.warriors)
         {
             if (g.star.id == star.id)
             {
@@ -37,20 +39,45 @@ public class AITemplate : MonoBehaviour
                     Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.WarriorMoveSpeed);
                     g.addWarrior(w);
                 }
-            }
-            else
-            {
-                for (int i = 0; i < num; i++)
-                {
-                    Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.WarriorMoveSpeed);
-                    List<Warrior.Warrior> wl = new List<Warrior.Warrior>();
-                    Warrior.WarriorGroup newGroup = new Warrior.WarriorGroup(wl);
-                    this.warriors.Add(newGroup);
-                }
+                break;
             }
         }
+        List<Warrior.Warrior> wl = new List<Warrior.Warrior>();
+        for (int i = 0; i < num; i++)
+        {
+            Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.WarriorMoveSpeed);
+            wl.Add(w);
+        }
+        Warrior.WarriorGroup newGroup = new Warrior.WarriorGroup(wl);
+        this.warriors.Add(newGroup);
     }
 
+    private void checkAdjStars (MapElement.Star cur, float dist)
+    {
+        if (dist < 0)
+        {
+            return;
+        }
+        if (!this.viewedStars.Contains(cur))
+        {
+            this.viewedStars.Add(cur);
+        }
+        foreach (MapElement.Star star in cur.adj)
+        {
+            checkAdjStars(star, dist - Vector2.Distance(cur.pos, star.pos));
+        }
+
+    }
+
+    //获取视野范围内星系
+    public void addViewedStars ()
+    {
+        foreach (MapElement.Star star in this.ownedStars)
+        {
+            checkAdjStars(star, this.vision);
+        }
+    }
+    
     // Start is called before the first frame update
     void Start()
     {
