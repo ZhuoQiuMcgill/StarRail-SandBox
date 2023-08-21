@@ -13,6 +13,7 @@ namespace MapElement
         public bool isLivable = false;          // 是否宜居
         public bool isDestroyed = false;        // 是否被摧毁
         public List<Star> adj { get; set; }     // 记录相邻的星系
+        public Vector4 color { get; set; }
 
         // 资源数值
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
@@ -50,6 +51,7 @@ namespace MapElement
             else { this.type = 1; this.isLivable = false; }
 
             fillResources();
+            setColor();
         }
 
 
@@ -91,6 +93,16 @@ namespace MapElement
             }
 
             return res;
+        }
+
+        public void setColor()
+        {
+            if (this.type == 0) { this.color = new Vector4(148.0f / 255.0f, 0, 211.0f / 255.0f, 0.5f); }
+            else
+            {
+                if (this.isLivable) { this.color = new Vector4(0, 1.0f, 127.0f / 255.0f, 0.5f); }
+                else { this.color = new Vector4(220.0f / 255.0f, 20.0f / 255.0f, 60.0f / 255.0f, 0.5f); }
+            }
         }
 
     }

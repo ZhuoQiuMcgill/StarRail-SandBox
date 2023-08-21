@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using MapElement;
+using Rander;
 
 
 public class GameManager : MonoBehaviour
@@ -12,6 +13,7 @@ public class GameManager : MonoBehaviour
     public int numStars = 100;
 
     private MapElement.Galaxy map;
+    private Rander.GraphRanderer randerer;
     
     private List<GameObject> resourcesStars = new List<GameObject>();
     private List<GameObject> livableStars = new List<GameObject>();
@@ -30,6 +32,8 @@ public class GameManager : MonoBehaviour
     public TMP_Text starResourcesText;
     public TMP_Text gameObjectUIText;
 
+    public Material voronoiMaterial;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,6 +41,9 @@ public class GameManager : MonoBehaviour
         // ´´½¨µØÍ¼
         MapElement.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
         this.map = map;
+
+        Rander.GraphRanderer randerer = new Rander.GraphRanderer(this.map, this.voronoiMaterial);
+        this.randerer = randerer;
 
         CreateGameObject();
         Debug.Log("Resources Stars: " + this.resourcesStars.Count);
