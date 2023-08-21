@@ -17,9 +17,9 @@ public class AITemplate : MonoBehaviour
 
     private float aggressivity = 0.4f;
 
-    private int populationWeight = 0;
 
     //资源权重
+    private int populationWeight = 0;
     private int metalWeight = 0;
     private int energyWeight = 0;
     private int foodWeight = 0;
@@ -76,6 +76,12 @@ public class AITemplate : MonoBehaviour
         {
             checkAdjStars(star, this.vision);
         }
+    }
+
+    //决定行动
+    public void decideMoves()
+    {
+
     }
     
     // Start is called before the first frame update
