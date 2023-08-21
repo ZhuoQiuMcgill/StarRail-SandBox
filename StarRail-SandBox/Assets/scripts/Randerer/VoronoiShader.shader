@@ -1,23 +1,20 @@
-Shader "Unlit/NewUnlitShader"
+Shader "Custom/VoronoiShader"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex("Texture", 2D) = "white" {}
     }
-    SubShader
-    {
-        Tags { "RenderType"="Opaque" }
-        LOD 100
 
+        SubShader
+    {
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
-
             #include "UnityCG.cginc"
+
+            #define MAX_VERTEX_COUNT 800 // 根据你的需要调整
 
             struct appdata
             {
@@ -28,29 +25,46 @@ Shader "Unlit/NewUnlitShader"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+            float4 _Positions[MAX_VERTEX_COUNT];
+            float4 _Colors[MAX_VERTEX_COUNT];
+            float4x4 _WorldToCameraMatrix;
+            float4x4 _ProjectionMatrix;
 
-            v2f vert (appdata v)
+            sampler2D _MainTex;
+
+            v2f vert(appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+                float4 worldPos = float4(v.vertex.xyz, 1);
+                float4 viewPos = mul(_WorldToCameraMatrix, worldPos);
+                o.vertex = mul(_ProjectionMatrix, viewPos);
+                o.uv = v.uv;
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                // sample the texture
+                float2 screenPos = i.uv;
+                float4 chosenColor = float4(1,1,1,1);
+                float minDistance = 1e10;
+
+                for (int j = 0; j < MAX_VERTEX_COUNT; j++)
+                {
+                    float2 vertexPos = _Positions[j].xy;
+                    float distToVertex = distance(screenPos, vertexPos);
+
+                    if (distToVertex < minDistance)
+                    {
+                        minDistance = distToVertex;
+                        chosenColor = _Colors[j];
+                    }
+                }
+
                 fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
-                return col;
+                return col * chosenColor;
             }
             ENDCG
         }

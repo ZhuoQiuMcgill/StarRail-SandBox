@@ -42,8 +42,13 @@ public class GameManager : MonoBehaviour
         MapElement.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
         this.map = map;
 
+        // 创建AI管理器
+
+
+        // 创建渲染器
         Rander.GraphRanderer randerer = new Rander.GraphRanderer(this.map, this.voronoiMaterial);
         this.randerer = randerer;
+        this.randerer.RenderGraph();
 
         CreateGameObject();
         Debug.Log("Resources Stars: " + this.resourcesStars.Count);
@@ -58,7 +63,7 @@ public class GameManager : MonoBehaviour
     {
         // 检查是否按下鼠标左键
         if (Input.GetMouseButtonDown(0)) { mouseLeftClickAction(); }
-        
+        this.randerer.RenderGraph();
     }
 
 

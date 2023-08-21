@@ -19,6 +19,13 @@ namespace Rander
 
         public void RenderGraph()
         {
+            Matrix4x4 worldToCamera = Camera.main.worldToCameraMatrix;
+            voronoiMaterial.SetMatrix("_WorldToCameraMatrix", worldToCamera);
+
+            Matrix4x4 projectionMatrix = Camera.main.projectionMatrix;
+            voronoiMaterial.SetMatrix("_ProjectionMatrix", projectionMatrix);
+
+
             List<Vector4> positions = new List<Vector4>();
             List<Vector4> colors = new List<Vector4>();
 
