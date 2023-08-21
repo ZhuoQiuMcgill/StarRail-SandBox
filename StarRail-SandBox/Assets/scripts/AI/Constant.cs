@@ -27,6 +27,17 @@ namespace Constant
         public const int defaultMinionATK = 10;
         public const int defaultMinionDEF = 10;
 
+        //≈…œµ—’…´
+        public const int destructionColor = 0x606060;
+        public const int huntColor = 0x00ff80;
+        public const int abundanceColor = 0xffff00;
+        public const int preservationColor = 0xcc6600;
+        public const int eruditionColor = 0x004c99;
+        public const int nihilityColor = 0x4c0099;
+        public const int harmonyColor = 0xff66ff;
+        public const int trailBlazeColor = 0xff0000;
+        
+
 
         public static int DamageCalculation(int ATK, int DEF)
         {
