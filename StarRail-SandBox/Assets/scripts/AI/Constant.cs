@@ -13,9 +13,10 @@ namespace Constant
         public const int defaultStarFoodProductionRate = 2 * defaultCitizenConsume;
 
         //War
-        public const int CitizenToWarrior = 1;
-        public const int CitizenToWarriorRate = 3;
-        public const int WarriorMoveSpeed = 25;
+        public const int citizenToWarrior = 1;
+        public const int citizenToWarriorRate = 3;
+        public const int warriorMoveSpeed = 25;
+        public const int warriorMaintainenceCost = 15;
 
         //Building
         public const int defaultCitizenEfficiency = 1;

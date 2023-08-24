@@ -17,6 +17,14 @@ public class AITemplate : MonoBehaviour
 
     private float aggressivity = 0.4f;
 
+    //资源
+    private int totalfood = 0;
+    private int totalMetal = 0;
+    private int totalEnergy = 0;
+    private int totalPopulation = 0;
+    private int totalWarriors = 0;
+    
+
 
     //资源权重
     private int populationWeight = 0;
@@ -27,16 +35,31 @@ public class AITemplate : MonoBehaviour
     //视野范围
     private float vision = 150.0f;
 
+    //占领星球
+    public void buildStar(MapElement.Star star)
+    {
+        this.ownedStars.Add(star);
+        this.totalfood += star.resources[MapResources.Resources.Food];
+        this.totalMetal += star.resources[MapResources.Resources.Metal];
+        this.totalEnergy += star.resources[MapResources.Resources.Energy];
+        this.totalPopulation += star.resources[MapResources.Resources.Population];
+    }
+
     //生产士兵
     public void createWarriors (MapElement.Star star, int num)
     {
+        if (num > this.totalPopulation)
+        {
+            return;
+        }
+        this.totalPopulation -= num;
         foreach (Warrior.WarriorGroup g in this.warriors)
         {
             if (g.star.id == star.id)
             {
                 for (int i = 0; i < num; i++)
                 {
-                    Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.WarriorMoveSpeed);
+                    Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.warriorMoveSpeed);
                     g.addWarrior(w);
                 }
                 break;
@@ -45,11 +68,13 @@ public class AITemplate : MonoBehaviour
         List<Warrior.Warrior> wl = new List<Warrior.Warrior>();
         for (int i = 0; i < num; i++)
         {
-            Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.WarriorMoveSpeed);
+            Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.warriorMoveSpeed);
             wl.Add(w);
         }
         Warrior.WarriorGroup newGroup = new Warrior.WarriorGroup(wl);
         this.warriors.Add(newGroup);
+        this.totalWarriors += num;
+
     }
 
     private void checkAdjStars (MapElement.Star cur, float dist)
@@ -76,6 +101,17 @@ public class AITemplate : MonoBehaviour
         {
             checkAdjStars(star, this.vision);
         }
+    }
+
+    public void sortViewedStars ()
+    {
+
+    }
+
+    public void produceWarrior ()
+    {
+        int foodCost = this.totalWarriors * Constant.Constant.warriorMaintainenceCost;
+
     }
 
     //决定行动
