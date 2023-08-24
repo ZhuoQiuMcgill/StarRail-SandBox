@@ -21,7 +21,7 @@ public class StarData : MonoBehaviour
 
         foreach (var pair in this.star.resources)
         {
-            sb.AppendLine($"{pair.Key.ToCustomString()}: {pair.Value}");
+            sb.Append($"{pair.Key.ToCustomString()}: {pair.Value}\t");
         }
 
         return sb.ToString();
