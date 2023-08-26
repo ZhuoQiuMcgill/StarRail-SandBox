@@ -97,11 +97,12 @@ namespace MapElement
 
         public void setColor()
         {
-            if (this.type == 0) { this.color = new Vector4(148.0f / 255.0f, 0, 211.0f / 255.0f, 0.5f); }
+            if (this.type == 1) { this.color = new Vector4(148.0f / 255.0f, 0, 211.0f / 255.0f, 1f); }
             else
             {
-                if (this.isLivable) { this.color = new Vector4(0, 1.0f, 127.0f / 255.0f, 0.5f); }
-                else { this.color = new Vector4(220.0f / 255.0f, 20.0f / 255.0f, 60.0f / 255.0f, 0.5f); }
+                this.color = new Vector4(0.0f, 0.0f, 0.0f, 1f);
+                //if (this.isLivable) { this.color = new Vector4(0, 1.0f, 127.0f / 255.0f, 0.5f); }
+                //else { this.color = new Vector4(0.0f, 0.0f, 0.0f, 1f); }
             }
         }
 

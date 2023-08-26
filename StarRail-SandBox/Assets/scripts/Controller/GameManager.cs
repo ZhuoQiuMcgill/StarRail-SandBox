@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
     {
         // 检查是否按下鼠标左键
         if (Input.GetMouseButtonDown(0)) { mouseLeftClickAction(); }
-        this.randerer.RenderGraph();
+        //this.randerer.RenderGraph();
     }
 
 

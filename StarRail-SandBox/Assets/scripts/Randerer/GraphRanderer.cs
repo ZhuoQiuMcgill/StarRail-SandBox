@@ -25,19 +25,32 @@ namespace Rander
             Matrix4x4 projectionMatrix = Camera.main.projectionMatrix;
             voronoiMaterial.SetMatrix("_ProjectionMatrix", projectionMatrix);
 
+            Texture2D positionTexture = new Texture2D(800, 1, TextureFormat.RGBAFloat, false);
+            Texture2D colorTexture = new Texture2D(800, 1, TextureFormat.RGBAFloat, false);
 
-            List<Vector4> positions = new List<Vector4>();
-            List<Vector4> colors = new List<Vector4>();
-
+            int index = 0;
             foreach (var vertex in graph.stars)
             {
-                positions.Add(new Vector4(vertex.pos.x, vertex.pos.y, 0, 0));
-                colors.Add(vertex.color);
+                // 直接规范化坐标到[0, 1]范围
+                float normalizedX = vertex.pos.x / 2000;
+                float normalizedY = vertex.pos.y / 2000;
+
+                positionTexture.SetPixel(index, 0, new Color(normalizedX, normalizedY, 0, 0));
+                colorTexture.SetPixel(index, 0, vertex.color);
+
+                Debug.Log(vertex.id + ": " + vertex.color);
+
+                index++;
             }
 
-            voronoiMaterial.SetVectorArray("_Positions", positions.ToArray());
-            voronoiMaterial.SetVectorArray("_Colors", colors.ToArray());
+            positionTexture.Apply();
+            colorTexture.Apply();
+
+            voronoiMaterial.SetTexture("_PositionTex", positionTexture);
+            voronoiMaterial.SetTexture("_ColorTex", colorTexture);
         }
+
+
 
     }
 }
