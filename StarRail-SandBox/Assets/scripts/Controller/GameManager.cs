@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    // 生成所有Map相关的gameObject
+    // TODO: 将map里的星系以及路径生成成对应的gameobject
     private void CreateGameObject()
     {
         foreach (MapElement.Star star in this.map.stars)
@@ -129,7 +129,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // 生成path的gameObject
     private GameObject CreateGameObjectFromPath(MapElement.Path path)
     {
         Vector2 pos1 = path.star1.pos;
@@ -170,17 +169,9 @@ public class GameManager : MonoBehaviour
         // 设定大小
         rectangleObj.transform.localScale = new Vector3(length, 1, 1);
 
-        // 设置Sprite Renderer的"Order in Layer"
-        SpriteRenderer pathSpriteRenderer = rectangleObj.GetComponent<SpriteRenderer>();
-        if (pathSpriteRenderer != null)
-        {
-            pathSpriteRenderer.sortingOrder = 6; 
-        }
-
         return rectangleObj;
     }
 
-    // 生成star的gameObject
     private GameObject CreateGameObjectFromStar(MapElement.Star star)
     {
         Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, -0.5f);
@@ -217,12 +208,6 @@ public class GameManager : MonoBehaviour
         // 添加StarData组件并初始化数据
         StarData starData = newStar.AddComponent<StarData>();
         starData.Initialize(star);
-
-        SpriteRenderer starSpriteRenderer = newStar.GetComponent<SpriteRenderer>();
-        if (starSpriteRenderer != null)
-        {
-            starSpriteRenderer.sortingOrder = 7;
-        }
 
         return newStar;
     }
