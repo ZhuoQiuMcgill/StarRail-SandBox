@@ -21,7 +21,7 @@ namespace MapElement
 
         private double livableRate = 0.2;           // 生成宜居星系的概率
         private double blackholeRate = 0.05;        // 生成黑洞星系的概率
-        private List<List<List<Star>>> grid;        // 地图分区
+        private List<List<List<Star>>> grid;   // 地图分区
         private int gridSize = 100;                 // 分区大小
         private float[] pathRate = new float[] { 1.0f, 1.0f, 0.2f };
         private int maxDegree;                      // 每个星系的最大路径
