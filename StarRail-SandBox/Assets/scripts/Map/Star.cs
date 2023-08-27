@@ -8,14 +8,14 @@ namespace MapElement
     public class Star
     {
         public int id { get; }
-        public int type { get; set; }           // 0Ϊ��Դ����ϵ��1Ϊ�ڶ�
-        public Vector2 pos { get; set; }        // λ����Ϣ
-        public bool isLivable = false;          // �Ƿ��˾�
-        public bool isDestroyed = false;        // �Ƿ񱻴ݻ�
-        public List<Star> adj { get; set; }     // ��¼���ڵ���ϵ
+        public int type { get; set; }           // 
+        public Vector2 pos { get; set; }        // 
+        public bool isLivable = false;          // 
+        public bool isDestroyed = false;        // 
+        public List<Star> adj { get; set; }     // 
         public Vector4 color { get; set; }
 
-        // ��Դ��ֵ
+        // 
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
             {
                 {MapResources.Resources.Population, 0},
@@ -26,9 +26,9 @@ namespace MapElement
             };
 
 
-        public int resTick = 1000;     // �ݻ���ϵʱ�ɻ�ȡ���ٸ�tick����Դ
-        public int maxResValue = 21;   // �����Դ��ֵ
-        public int minResValue = 5;    // ��С��Դ��ֵ
+        public int resTick = 1000;     // 
+        public int maxResValue = 21;   // 
+        public int minResValue = 5;    // 
 
 
         public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
@@ -37,13 +37,13 @@ namespace MapElement
             this.pos = pos;
             this.adj = new List<Star>();
 
-            // �ж��Ƿ��Ǻڶ�
+            
             float randomNumber = UnityEngine.Random.Range(0f, 1f);
             if (randomNumber > blackholeRate)
             {
                 this.type = 0;
 
-                // �ж��Ƿ��˾�
+               
                 randomNumber = UnityEngine.Random.Range(0f, 1f);
                 if (randomNumber < livableRate) { this.isLivable = true; }
                 else { this.isLivable = false; }
@@ -56,7 +56,7 @@ namespace MapElement
 
 
         /**
-         * ��һ����ϵ�����Դ
+         * 
          */
         public void fillResources()
         {
@@ -77,7 +77,7 @@ namespace MapElement
         }
 
         /**
-         * �ݻ���ϵʱʹ�����Method�����شݻٺ��õ���Դ��ֵ�Լ���ո���ϵ��Դ����
+         * 
          */
         public Dictionary<MapResources.Resources, int> destroy()
         {

@@ -30,9 +30,9 @@ namespace Rander
 
             int index = 0;
             foreach (var vertex in graph.stars)
-            {           
-                float normalizedX = vertex.pos.x / 2000;
-                float normalizedY = vertex.pos.y / 2000;
+            {
+                float normalizedX = (vertex.pos.x + 100f) / 2200.0f;
+                float normalizedY = (vertex.pos.y + 100f) / 2200.0f;
 
                 positionTexture.SetPixel(index, 0, new Color(normalizedX, normalizedY, 0, 0));
                 colorTexture.SetPixel(index, 0, vertex.color);
