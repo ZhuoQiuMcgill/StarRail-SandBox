@@ -8,9 +8,9 @@ using Rander;
 
 public class GameManager : MonoBehaviour
 {
-    public int width = 1000;
-    public int height = 500;
-    public int numStars = 100;
+    public int width;
+    public int height;
+    public int numStars;
 
     private MapElement.Galaxy map;
     private Rander.GraphRanderer randerer;
@@ -61,14 +61,13 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // ����Ƿ���������
         if (Input.GetMouseButtonDown(0)) { mouseLeftClickAction(); }
-        //this.randerer.RenderGraph();
+        this.randerer.RenderGraph();
     }
 
 
     /**
-     * 
+     * 鼠标左键函数
      */
     private void mouseLeftClickAction()
     {
@@ -133,40 +132,31 @@ public class GameManager : MonoBehaviour
     {
         Vector2 pos1 = path.star1.pos;
         Vector2 pos2 = path.star2.pos;
-
-        // 
         Vector2 midpoint = (pos1 + pos2) / 2;
 
-        // 
         float length = Vector2.Distance(pos1, pos2);
-
-        //
         float angleRad = Mathf.Atan2(pos2.y - pos1.y, pos2.x - pos1.x);
         float angleDeg = angleRad * Mathf.Rad2Deg;
 
-        // 
+        
         GameObject rectangleObj = Instantiate(path.unionPath ? unionPathPrefab : pathPrefab);
 
-        // 
+        
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
         rectangleObj.name = rectangleName;
-
-        // 
         rectangleObj.tag = "Path";
 
-        // 
+        
         Transform parent = GameObject.Find("Map/Paths").transform;
         rectangleObj.transform.SetParent(parent);
 
-        // 
+        
         PathData pathData = rectangleObj.AddComponent<PathData>();
         pathData.Initialize(path);
 
-        // 
+        
         rectangleObj.transform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
         rectangleObj.transform.rotation = Quaternion.Euler(0, 0, angleDeg);
-
-        // 
         rectangleObj.transform.localScale = new Vector3(length, 1, 1);
 
         return rectangleObj;
@@ -178,7 +168,6 @@ public class GameManager : MonoBehaviour
         GameObject prefab;
         Transform parent;
 
-        // 
         if (star.type == 1)
         {
             prefab = this.blackholePrefab;
@@ -201,11 +190,8 @@ public class GameManager : MonoBehaviour
 
         GameObject newStar = Instantiate(prefab, starPosition, Quaternion.identity, parent);
         newStar.name = star.id.ToString();
-
-        // 
         newStar.tag = "Star";
 
-        // 
         StarData starData = newStar.AddComponent<StarData>();
         starData.Initialize(star);
 

@@ -8,12 +8,12 @@ namespace MapElement
     public class Star
     {
         public int id { get; }
-        public int type { get; set; }           // 
-        public Vector2 pos { get; set; }        // 
-        public bool isLivable = false;          // 
-        public bool isDestroyed = false;        // 
-        public List<Star> adj { get; set; }     // 
-        public Vector4 color { get; set; }
+        public int type { get; set; }           // 0 代表普通星系，1 代表黑洞
+        public Vector2 pos { get; set; }        // 位置坐标
+        public bool isLivable = false;          // 是否是宜居星系
+        public bool isDestroyed = false;        // 是否被摧毁
+        public List<Star> adj { get; set; }     // 相邻星系
+        public Vector4 color { get; set; }      
 
         // 
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
@@ -26,9 +26,9 @@ namespace MapElement
             };
 
 
-        public int resTick = 1000;     // 
-        public int maxResValue = 21;   // 
-        public int minResValue = 5;    // 
+        public int resTick = 1000;     // 摧毁时可获得多少个tick的资源
+        public int maxResValue = 21;   // 最大资源数
+        public int minResValue = 5;    // 最小资源数
 
 
         public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
@@ -89,7 +89,7 @@ namespace MapElement
             foreach (KeyValuePair<MapResources.Resources, int> resource in this.resources)
             {
                 res[resource.Key] = resource.Value * this.resTick;
-                this.resources[resource.Key] = 0;  // �ٻ����޷��ٻ�ȡ��Դ
+                this.resources[resource.Key] = 0;
             }
 
             return res;

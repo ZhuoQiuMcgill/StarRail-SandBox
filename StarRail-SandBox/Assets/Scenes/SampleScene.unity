@@ -515,9 +515,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 695b69fa4cc529a41bad62eb713a54c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1000
+  moveSpeed: 500
   zoomSpeed: 200
-  minSize: 2
+  minSize: 100
   maxSize: 500
 --- !u!1 &710240757
 GameObject:

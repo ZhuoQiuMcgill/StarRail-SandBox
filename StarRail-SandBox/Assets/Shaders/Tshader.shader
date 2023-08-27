@@ -6,6 +6,11 @@ Shader "Unlit/Tshader"
         _PositionTex("Position Texture", 2D) = "white" {}
         _ColorTex("Color Texture", 2D) = "white" {}
         _Radius("Radius", float) = 0.0025
+
+        _TopLeft("TopLeft", Vector) = (0,0,0,0)
+        _TopRight("TopRight", Vector) = (0,0,0,0)
+        _BottomLeft("BottomLeft", Vector) = (0,0,0,0)
+        _BottomRight("BottomRight", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -36,6 +41,11 @@ Shader "Unlit/Tshader"
             float _Radius;
             float4 _MainTex_ST;
 
+            float4 _TopLeft;
+            float4 _TopRight;
+            float4 _BottomLeft;
+            float4 _BottomRight;
+
             v2f vert(appdata v)
             {
                 v2f o;
@@ -46,9 +56,15 @@ Shader "Unlit/Tshader"
 
             fixed4 frag(v2f i) : SV_Target
             {
+                if (i.uv.x < _TopLeft.x || i.uv.x > _TopRight.x || i.uv.y > _TopLeft.y || i.uv.y < _BottomRight.y)
+                {
+                    return fixed4(0,0,0,1); // 不在视野内，直接返回黑色或透明
+                }
+
                 float2 currentPoint = i.uv; // 当前像素的UV坐标
                 float minDistance = 1.0; // 初始化最小距离为1（最大距离）
                 float4 nearestColor = float4(1, 1, 1, 1); // 初始化最近点颜色为白色
+
 
                 // 循环遍历所有种子点
                 for (int j = 0; j < 800; j++)
