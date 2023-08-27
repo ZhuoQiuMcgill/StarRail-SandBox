@@ -58,7 +58,7 @@ Shader "Unlit/Tshader"
             {
                 if (i.uv.x < _TopLeft.x || i.uv.x > _TopRight.x || i.uv.y > _TopLeft.y || i.uv.y < _BottomRight.y)
                 {
-                    return fixed4(0,0,0,1); // 不在视野内，直接返回黑色或透明
+                    return fixed4(0,0,0,1); // 不在视野内，直接返回黑色
                 }
 
                 float2 currentPoint = i.uv; // 当前像素的UV坐标
@@ -66,7 +66,6 @@ Shader "Unlit/Tshader"
                 float4 nearestColor = float4(1, 1, 1, 1); // 初始化最近点颜色为白色
 
 
-                // 循环遍历所有种子点
                 for (int j = 0; j < 800; j++)
                 {
                     float2 seed = tex2D(_PositionTex, float2((j + 0.5) / 800.0, 0.5)).xy; // 从纹理中获取种子点坐标
