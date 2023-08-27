@@ -1,19 +1,21 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MapResources; 
+using MapResources;
 
-namespace Star
+namespace MapElement
 {
     public class Star
     {
         public int id { get; }
-        public int type { get; set; }
-        public Vector2 pos { get; set; }
-        public bool isLivable = false;
-        public bool isDestroyed = false;
+        public int type { get; set; }           // 0 ä»£è¡¨æ™®é€šæ˜Ÿç³»ï¼Œ1 ä»£è¡¨é»‘æ´
+        public Vector2 pos { get; set; }        // ä½ç½®åæ ‡
+        public bool isLivable = false;          // æ˜¯å¦æ˜¯å®œå±…æ˜Ÿç³»
+        public bool isDestroyed = false;        // æ˜¯å¦è¢«æ‘§æ¯
+        public List<Star> adj { get; set; }     // ç›¸é‚»æ˜Ÿç³»
+        public Vector4 color { get; set; }      
 
-        // ×ÊÔ´ÊıÖµ
+        // 
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
             {
                 {MapResources.Resources.Population, 0},
@@ -23,24 +25,25 @@ namespace Star
                 {MapResources.Resources.Technology, 0}
             };
 
-        
-        private int resTick = 1000;     // ´İ»ÙĞÇÏµÊ±¿É»ñÈ¡¶àÉÙ¸ötickµÄ×ÊÔ´
-        private int maxResValue = 21;   // ×î´ó×ÊÔ´ÊıÖµ
-        private int minResValue = 5;    // ×îĞ¡×ÊÔ´ÊıÖµ
+
+        public int resTick = 1000;     // æ‘§æ¯æ—¶å¯è·å¾—å¤šå°‘ä¸ªtickçš„èµ„æº
+        public int maxResValue = 21;   // æœ€å¤§èµ„æºæ•°
+        public int minResValue = 5;    // æœ€å°èµ„æºæ•°
 
 
         public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
         {
             this.id = id;
             this.pos = pos;
+            this.adj = new List<Star>();
 
-            // ÅĞ¶¨ÊÇ·ñÊÇºÚ¶´
+            
             float randomNumber = UnityEngine.Random.Range(0f, 1f);
             if (randomNumber > blackholeRate)
             {
                 this.type = 0;
 
-                // ÅĞ¶¨ÊÇ·ñÒË¾Ó
+               
                 randomNumber = UnityEngine.Random.Range(0f, 1f);
                 if (randomNumber < livableRate) { this.isLivable = true; }
                 else { this.isLivable = false; }
@@ -48,8 +51,13 @@ namespace Star
             else { this.type = 1; this.isLivable = false; }
 
             fillResources();
+            setColor();
         }
 
+
+        /**
+         * 
+         */
         public void fillResources()
         {
             if (this.type == 1)
@@ -68,7 +76,9 @@ namespace Star
             }
         }
 
-
+        /**
+         * 
+         */
         public Dictionary<MapResources.Resources, int> destroy()
         {
             this.isLivable = false;
@@ -79,10 +89,25 @@ namespace Star
             foreach (KeyValuePair<MapResources.Resources, int> resource in this.resources)
             {
                 res[resource.Key] = resource.Value * this.resTick;
-                this.resources[resource.Key] = 0;  // »Ù»µºóÎŞ·¨ÔÙ»ñÈ¡×ÊÔ´
+                this.resources[resource.Key] = 0;
             }
 
             return res;
+        }
+
+        public void setColor()
+        {
+            if (this.type == 1) { this.color = new Vector4(0.14f, 0.0f, 0.2f, 1f); }
+            else if (this.type == 114514) 
+            { 
+                this.color = new Vector4(1f, 1f, 0f, 1f);
+                Debug.Log("114514");
+            }
+            else
+            {
+                if (this.isLivable) { this.color = new Vector4(0.0f, 0.2f, 0.0f, 1f); }
+                else { this.color = new Vector4(0.0f, 0.0f, 0.0f, 1f); }
+            }
         }
 
     }

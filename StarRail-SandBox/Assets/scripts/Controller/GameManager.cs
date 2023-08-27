@@ -1,109 +1,201 @@
-using System.Collections;
+锘縰sing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Galaxy;
-using Star;
-using Path;
+using TMPro;
+using MapElement;
+using Rander;
+
 
 public class GameManager : MonoBehaviour
 {
-    public int width = 1000;
-    public int height = 500;
-    public int numStars = 100;
+    public int width;
+    public int height;
+    public int numStars;
 
-    private Galaxy.Galaxy map;
-    //转录为GameObject list
-    private List<GameObject> renderedStar = new List<GameObject>();
+    private MapElement.Galaxy map;
+    private Rander.GraphRanderer randerer;
+
+    private List<GameObject> resourcesStars = new List<GameObject>();
+    private List<GameObject> livableStars = new List<GameObject>();
+    private List<GameObject> blackholes = new List<GameObject>();
+
     private List<GameObject> renderedPath = new List<GameObject>();
 
-    public GameObject starprefab;
-    public GameObject pathprefab;
+
+    public GameObject starPrefab;
+    public GameObject livableStarPrefab;
+    public GameObject blackholePrefab;
+    public GameObject pathPrefab;
+    public GameObject unionPathPrefab;
+
+    // UI
+    public TMP_Text starResourcesText;
+    public TMP_Text gameObjectUIText;
+
+    public Material voronoiMaterial;
 
     // Start is called before the first frame update
     void Start()
     {
-        // 创建地图
-        Galaxy.Galaxy map = new Galaxy.Galaxy(this.numStars, this.width, this.height);
-        Debug.Log(map.stars.Count);
+
+        MapElement.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
         this.map = map;
+
+        MapElement.Star debugStar = new MapElement.Star(114514, new Vector2(0f, 0f), 0.0, 0.0);
+        debugStar.type = 114514;
+        debugStar.setColor();
+        this.map.stars.Add(debugStar);
+
+        Rander.GraphRanderer randerer = new Rander.GraphRanderer(this.map, this.voronoiMaterial);
+        this.randerer = randerer;
+        this.randerer.RenderGraph();
+
         CreateGameObject();
-        rander();
+        Debug.Log("Resources Stars: " + this.resourcesStars.Count);
+        Debug.Log("Livable Stars: " + this.livableStars.Count);
+        Debug.Log("Blackhole: " + this.blackholes.Count);
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetMouseButtonDown(0)) { mouseLeftClickAction(); }
+        this.randerer.RenderGraph();
     }
 
-    // TODO: 将map里的星系以及路径生成成对应的gameobject
+
+    /**
+     * 榧犳爣宸﹂敭鍑芥暟
+     */
+    private void mouseLeftClickAction()
+    {
+        
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+        if (hit.collider != null)
+        {
+            
+            if (hit.collider.CompareTag("Star"))
+            {
+                StarData starData = hit.collider.gameObject.GetComponent<StarData>();
+                if (starData != null)
+                {
+                    Debug.Log("Clicked on a Star: " + starData.star.id + " resources: \n" + starData.ResourcesInfo());
+                    starResourcesText.text = starData.ResourcesInfo();
+                    gameObjectUIText.text = "Star: " + hit.collider.gameObject.name;
+                }
+
+            }
+
+           
+            else if (hit.collider.CompareTag("Path"))
+            {
+                PathData pathData = hit.collider.gameObject.GetComponent<PathData>();
+                Debug.Log("Clicked on a Path: " + hit.collider.gameObject.name + "\tspeed rate: " + pathData.path.speedRate);
+                starResourcesText.text = "";
+                gameObjectUIText.text = "Path: " + hit.collider.gameObject.name;
+            }
+
+        }
+        else
+        {
+            starResourcesText.text = "";
+            gameObjectUIText.text = "";
+        }
+    }
+
+
     private void CreateGameObject()
     {
-        foreach (Star.Star star in this.map.stars)
+        foreach (MapElement.Star star in this.map.stars)
         {
-            GameObject newStar = CreateGameObjectFromstar(star);
-            renderedStar.Add(newStar);
+            if (star.type == 1) { this.blackholes.Add(CreateGameObjectFromStar(star)); }
+            else
+            {
+                if (star.isLivable) { this.livableStars.Add(CreateGameObjectFromStar(star)); }
+                else { this.resourcesStars.Add(CreateGameObjectFromStar(star)); }
+            }
         }
 
-        foreach (Path.Path path in this.map.paths)
+        foreach (MapElement.Path path in this.map.paths)
         {
-            GameObject newPath = CreateGameObjectFrompath(path);
-            renderedStar.Add(newPath);
+            renderedPath.Add(CreateGameObjectFromPath(path));
         }
     }
 
-    private GameObject CreateGameObjectFrompath(Path.Path path)
+    private GameObject CreateGameObjectFromPath(MapElement.Path path)
     {
         Vector2 pos1 = path.star1.pos;
         Vector2 pos2 = path.star2.pos;
-
-        // 计算中点
         Vector2 midpoint = (pos1 + pos2) / 2;
 
-        // 计算长度
         float length = Vector2.Distance(pos1, pos2);
-
-        // 计算旋转角度
         float angleRad = Mathf.Atan2(pos2.y - pos1.y, pos2.x - pos1.x);
         float angleDeg = angleRad * Mathf.Rad2Deg;
 
-        // 创建GameObject，并以两个星系的ID为名
+        
+        GameObject rectangleObj = Instantiate(path.unionPath ? unionPathPrefab : pathPrefab);
+
+        
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
-        GameObject rectangleObj = new GameObject(rectangleName);
-        var rectTransform = rectangleObj.AddComponent<RectTransform>();
+        rectangleObj.name = rectangleName;
+        rectangleObj.tag = "Path";
 
-        // 假设宽度为0.5，可以根据需要更改
-        float width = 0.5f;
+        
+        Transform parent = GameObject.Find("Map/Paths").transform;
+        rectangleObj.transform.SetParent(parent);
 
-        rectTransform.sizeDelta = new Vector2(length, width);
-        rectTransform.position = midpoint;
-        rectTransform.rotation = Quaternion.Euler(0, 0, angleDeg);
+        
+        PathData pathData = rectangleObj.AddComponent<PathData>();
+        pathData.Initialize(path);
 
+        
+        rectangleObj.transform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
+        rectangleObj.transform.rotation = Quaternion.Euler(0, 0, angleDeg);
+        rectangleObj.transform.localScale = new Vector3(length, 1, 1);
 
         return rectangleObj;
     }
 
-    private GameObject CreateGameObjectFromstar(Star.Star star)
+    private GameObject CreateGameObjectFromStar(MapElement.Star star)
     {
-        Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, -0.2f);
-        GameObject newStar = Instantiate(starprefab, starPosition, Quaternion.identity);
+        Vector3 starPosition = new Vector3(star.pos.x, star.pos.y, -0.5f);
+        GameObject prefab;
+        Transform parent;
+
+        if (star.type == 1)
+        {
+            prefab = this.blackholePrefab;
+            parent = GameObject.Find("Map/Stars/Blackhole").transform;
+        }
+        else
+        {
+            if (star.isLivable)
+            {
+                prefab = this.livableStarPrefab;
+                parent = GameObject.Find("Map/Stars/LivableStars").transform;
+            }
+            else
+            {
+                prefab = this.starPrefab;
+                parent = GameObject.Find("Map/Stars/ResourcesStars").transform;
+            }
+        }
+
+
+        GameObject newStar = Instantiate(prefab, starPosition, Quaternion.identity, parent);
         newStar.name = star.id.ToString();
-        newStar.layer = star.type;
-        newStar.isStatic = star.isLivable;
-        newStar.isStatic = star.isDestroyed;
+        newStar.tag = "Star";
+
+        StarData starData = newStar.AddComponent<StarData>();
+        starData.Initialize(star);
+
         return newStar;
     }
 
-    // TODO: 将已经生产的gameobject渲染至画面
-    private void rander()
-    {
-        foreach (GameObject newStar in renderedStar)
-        {
-            Instantiate(starprefab, newStar.transform.position, Quaternion.identity);            
-        }
-        foreach (GameObject newPath in renderedPath)
-        {
-            Instantiate(pathprefab, new Vector3(newPath.transform.position.x, newPath.transform.position.y, -0.2f), Quaternion.identity);
-        }
-    }
 }
