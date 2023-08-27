@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
 
         Rander.GraphRanderer randerer = new Rander.GraphRanderer(this.map, this.voronoiMaterial);
         this.randerer = randerer;
+        this.randerer.RenderGraph();
 
         CreateGameObject();
         Debug.Log("Resources Stars: " + this.resourcesStars.Count);
