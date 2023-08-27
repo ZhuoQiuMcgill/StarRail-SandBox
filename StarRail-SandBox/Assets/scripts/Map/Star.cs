@@ -33,6 +33,8 @@ namespace MapElement
         //星系在派系中的重要程度
         public int priority { get; }
 
+        public Warrior.WarriorGroup currentArmy;
+
 
         public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
         {

@@ -4,6 +4,17 @@ using UnityEngine;
 
 namespace Constant
 {
+    public enum civNames
+    {
+        Destruction,
+        Hunt,
+        Abundance,
+        Erudition,
+        Nihility,
+        Harmony,
+        TrailBlaze,
+        Default
+    }
     public class Constant
     {
         //Star
@@ -37,6 +48,9 @@ namespace Constant
         public Vector3 nihilityColor = new Vector3(0.423f, 0.130f, 0.495f);
         public Vector3 harmonyColor = new Vector3(0.988f, 0.134f, 0.990f);
         public Vector3 trailBlazeColor = new Vector3(0.990f, 0.000f, 0.019f);
+
+        //≈…œµ√˚≥∆
+
 
 
 

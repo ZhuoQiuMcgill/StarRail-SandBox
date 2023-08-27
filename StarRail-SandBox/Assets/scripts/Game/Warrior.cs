@@ -23,15 +23,20 @@ namespace Warrior
 
     public class WarriorGroup
     {
-        public List<Warrior> warriors { get; }
+        public List<Warrior> warriors { get; set; }
         public int totalATK { get; set; }
         public int totalDEF { get; set; }
         public int shield { get; set; }
 
-        public MapElement.Star star { get; }
+        public MapElement.Star star { get; set; }
 
-        public WarriorGroup (List<Warrior> warriors)
+        public Constant.civNames belongsTo { get; set; }
+
+        public bool IsMoving { get; set; }
+
+        public WarriorGroup (List<Warrior> warriors, Constant.civNames civ)
         {
+            this.belongsTo = civ;
             this.warriors = warriors;
             foreach (Warrior w in warriors)
             {

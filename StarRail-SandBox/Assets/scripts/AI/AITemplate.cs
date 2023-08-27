@@ -71,9 +71,66 @@ public class AITemplate : MonoBehaviour
             Warrior.Warrior w = new Warrior.Warrior(Constant.Constant.defaultMinionATK, Constant.Constant.defaultMinionDEF, Constant.Constant.warriorMoveSpeed);
             wl.Add(w);
         }
-        Warrior.WarriorGroup newGroup = new Warrior.WarriorGroup(wl);
+        Warrior.WarriorGroup newGroup = new Warrior.WarriorGroup(wl, Constant.civNames.Default);
         this.warriors.Add(newGroup);
         this.totalWarriors += num;
+    }
+
+    public List<MapElement.Star> findOptPath (MapElement.Star start, MapElement.Star dest)
+    {
+        List<MapElement.Star> open = new List<Star>();
+        Dictionary<MapElement.Star, float> fscore = new Dictionary<Star, float>();
+        List < MapElement.Star > path = new List<MapElement.Star>();
+
+        open.Add(start);
+        fscore.Add(start, 0.0f);
+
+        while (open.Count > 0)
+        {
+            MapElement.Star minStar = null;
+            float minFScore = float.MaxValue;
+            foreach (MapElement.Star s in open)
+            {
+                if (fscore[s] < minFScore)
+                {
+                    minFScore = fscore[s];
+                    minStar = s;
+                }
+            }
+            if (minStar == dest)
+            {
+                return path;
+            }
+            open.Remove(minStar);
+            foreach (MapElement.Star s in minStar.adj)
+            {
+                float g = minFScore + Vector2.Distance(s.pos, minStar.pos);
+                float h = Vector2.Distance(s.pos, dest.pos);
+                float f = g + h;
+                if (open.Contains(s))
+                {
+                    if (fscore[s] < f)
+                    {
+                        continue;
+                    }
+                }
+                if (path.Contains(s))
+                {
+                    if (fscore[s] < f)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    open.Add(s);
+                    fscore.Add(s, f);
+                }
+            }
+            path.Add(minStar);
+        }
+
+        return path;
 
     }
 
