@@ -1,20 +1,21 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MapResources; 
+using MapResources;
 
 namespace MapElement
 {
     public class Star
     {
         public int id { get; }
-        public int type { get; set; }           // 0Îª×ÊÔ´ÐÍÐÇÏµ£»1ÎªºÚ¶´
-        public Vector2 pos { get; set; }        // Î»ÖÃÐÅÏ¢
-        public bool isLivable = false;          // ÊÇ·ñÒË¾Ó
-        public bool isDestroyed = false;        // ÊÇ·ñ±»´Ý»Ù
-        public List<Star> adj { get; set; }     // ¼ÇÂ¼ÏàÁÚµÄÐÇÏµ
+        public int type { get; set; }           // 0Îªï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½1Îªï¿½Ú¶ï¿½
+        public Vector2 pos { get; set; }        // Î»ï¿½ï¿½ï¿½ï¿½Ï¢
+        public bool isLivable = false;          // ï¿½Ç·ï¿½ï¿½Ë¾ï¿½
+        public bool isDestroyed = false;        // ï¿½Ç·ñ±»´Ý»ï¿½
+        public List<Star> adj { get; set; }     // ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½Ïµ
+        public Vector4 color { get; set; }
 
-        // ×ÊÔ´ÊýÖµ
+        // ï¿½ï¿½Ô´ï¿½ï¿½Öµ
         public Dictionary<MapResources.Resources, int> resources = new Dictionary<MapResources.Resources, int>()
             {
                 {MapResources.Resources.Population, 0},
@@ -24,10 +25,10 @@ namespace MapElement
                 {MapResources.Resources.Technology, 0}
             };
 
-        
-        public int resTick = 1000;     // ´Ý»ÙÐÇÏµÊ±¿É»ñÈ¡¶àÉÙ¸ötickµÄ×ÊÔ´
-        public int maxResValue = 21;   // ×î´ó×ÊÔ´ÊýÖµ
-        public int minResValue = 5;    // ×îÐ¡×ÊÔ´ÊýÖµ
+
+        public int resTick = 1000;     // ï¿½Ý»ï¿½ï¿½ï¿½ÏµÊ±ï¿½É»ï¿½È¡ï¿½ï¿½ï¿½Ù¸ï¿½tickï¿½ï¿½ï¿½ï¿½Ô´
+        public int maxResValue = 21;   // ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½Öµ
+        public int minResValue = 5;    // ï¿½ï¿½Ð¡ï¿½ï¿½Ô´ï¿½ï¿½Öµ
 
 
         public Star(int id, Vector2 pos, double livableRate, double blackholeRate)
@@ -36,13 +37,13 @@ namespace MapElement
             this.pos = pos;
             this.adj = new List<Star>();
 
-            // ÅÐ¶¨ÊÇ·ñÊÇºÚ¶´
+            // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ÇºÚ¶ï¿½
             float randomNumber = UnityEngine.Random.Range(0f, 1f);
             if (randomNumber > blackholeRate)
             {
                 this.type = 0;
 
-                // ÅÐ¶¨ÊÇ·ñÒË¾Ó
+                // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½Ë¾ï¿½
                 randomNumber = UnityEngine.Random.Range(0f, 1f);
                 if (randomNumber < livableRate) { this.isLivable = true; }
                 else { this.isLivable = false; }
@@ -50,11 +51,12 @@ namespace MapElement
             else { this.type = 1; this.isLivable = false; }
 
             fillResources();
+            setColor();
         }
 
 
         /**
-         * ¸øÒ»¸öÐÇÏµÌî³ä×ÊÔ´
+         * ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½Ô´
          */
         public void fillResources()
         {
@@ -75,7 +77,7 @@ namespace MapElement
         }
 
         /**
-         * ´Ý»ÙÐÇÏµÊ±Ê¹ÓÃÕâ¸öMethod£¬·µ»Ø´Ý»Ùºó»ñµÃµÄ×ÊÔ´ÊýÖµÒÔ¼°Çå¿Õ¸ÃÐÇÏµ×ÊÔ´Éú³É
+         * ï¿½Ý»ï¿½ï¿½ï¿½ÏµÊ±Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½Methodï¿½ï¿½ï¿½ï¿½ï¿½Ø´Ý»Ùºï¿½ï¿½Ãµï¿½ï¿½ï¿½Ô´ï¿½ï¿½Öµï¿½Ô¼ï¿½ï¿½ï¿½Õ¸ï¿½ï¿½ï¿½Ïµï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½
          */
         public Dictionary<MapResources.Resources, int> destroy()
         {
@@ -87,10 +89,21 @@ namespace MapElement
             foreach (KeyValuePair<MapResources.Resources, int> resource in this.resources)
             {
                 res[resource.Key] = resource.Value * this.resTick;
-                this.resources[resource.Key] = 0;  // »Ù»µºóÎÞ·¨ÔÙ»ñÈ¡×ÊÔ´
+                this.resources[resource.Key] = 0;  // ï¿½Ù»ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½Ù»ï¿½È¡ï¿½ï¿½Ô´
             }
 
             return res;
+        }
+
+        public void setColor()
+        {
+            if (this.type == 1) { this.color = new Vector4(148.0f / 255.0f, 0, 211.0f / 255.0f, 1f); }
+            else
+            {
+                this.color = new Vector4(0.0f, 0.0f, 0.0f, 1f);
+                //if (this.isLivable) { this.color = new Vector4(0, 1.0f, 127.0f / 255.0f, 0.5f); }
+                //else { this.color = new Vector4(0.0f, 0.0f, 0.0f, 1f); }
+            }
         }
 
     }

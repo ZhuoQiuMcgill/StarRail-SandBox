@@ -43,3 +43,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: VoronoiGraph
+    uniqueID: 3424543207
+    locked: 0
+  - name: Map
+    uniqueID: 2760181811
+    locked: 0
+  - name: DataUI
+    uniqueID: 3377675163
+    locked: 0

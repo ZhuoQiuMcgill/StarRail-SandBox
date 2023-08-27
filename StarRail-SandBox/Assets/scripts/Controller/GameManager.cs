@@ -1,8 +1,9 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using MapElement;
+using Rander;
 
 
 public class GameManager : MonoBehaviour
@@ -12,7 +13,8 @@ public class GameManager : MonoBehaviour
     public int numStars = 100;
 
     private MapElement.Galaxy map;
-    
+    private Rander.GraphRanderer randerer;
+
     private List<GameObject> resourcesStars = new List<GameObject>();
     private List<GameObject> livableStars = new List<GameObject>();
     private List<GameObject> blackholes = new List<GameObject>();
@@ -26,17 +28,21 @@ public class GameManager : MonoBehaviour
     public GameObject pathPrefab;
     public GameObject unionPathPrefab;
 
-    // UI×é¼þ
+    // UI
     public TMP_Text starResourcesText;
     public TMP_Text gameObjectUIText;
+
+    public Material voronoiMaterial;
 
     // Start is called before the first frame update
     void Start()
     {
 
-        // ´´½¨µØÍ¼
         MapElement.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
         this.map = map;
+
+        Rander.GraphRanderer randerer = new Rander.GraphRanderer(this.map, this.voronoiMaterial);
+        this.randerer = randerer;
 
         CreateGameObject();
         Debug.Log("Resources Stars: " + this.resourcesStars.Count);
@@ -49,26 +55,26 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // ¼ì²éÊÇ·ñ°´ÏÂÊó±ê×ó¼ü
+        // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (Input.GetMouseButtonDown(0)) { mouseLeftClickAction(); }
-        
+        //this.randerer.RenderGraph();
     }
 
 
     /**
-     * Êó±ê×ó¼üº¯Êý
+     * 
      */
     private void mouseLeftClickAction()
     {
-        // ×ª»»Êó±êÎ»ÖÃµ½ÊÀ½ç×ø±ê
+        
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        // ´ÓÊó±êÎ»ÖÃ·¢ÉäÒ»ÌõÉäÏß
+        
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
 
         if (hit.collider != null)
         {
-            // Êó±ê»÷ÖÐÐÇÏµ
+            
             if (hit.collider.CompareTag("Star"))
             {
                 StarData starData = hit.collider.gameObject.GetComponent<StarData>();
@@ -81,7 +87,7 @@ public class GameManager : MonoBehaviour
 
             }
 
-            // Êó±ê»÷ÖÐÂ·¾¶
+           
             else if (hit.collider.CompareTag("Path"))
             {
                 PathData pathData = hit.collider.gameObject.GetComponent<PathData>();
@@ -91,18 +97,18 @@ public class GameManager : MonoBehaviour
             }
 
         }
-        else { 
+        else
+        {
             starResourcesText.text = "";
             gameObjectUIText.text = "";
         }
     }
 
 
-    // TODO: ½«mapÀïµÄÐÇÏµÒÔ¼°Â·¾¶Éú³É³É¶ÔÓ¦µÄgameobject
     private void CreateGameObject()
     {
         foreach (MapElement.Star star in this.map.stars)
-        {          
+        {
             if (star.type == 1) { this.blackholes.Add(CreateGameObjectFromStar(star)); }
             else
             {
@@ -122,39 +128,39 @@ public class GameManager : MonoBehaviour
         Vector2 pos1 = path.star1.pos;
         Vector2 pos2 = path.star2.pos;
 
-        // ¼ÆËãÖÐµã
+        // 
         Vector2 midpoint = (pos1 + pos2) / 2;
 
-        // ¼ÆËã³¤¶È
+        // 
         float length = Vector2.Distance(pos1, pos2);
 
-        // ¼ÆËãÐý×ª½Ç¶È
+        //
         float angleRad = Mathf.Atan2(pos2.y - pos1.y, pos2.x - pos1.x);
         float angleDeg = angleRad * Mathf.Rad2Deg;
 
-        // ÊµÀý»¯Ô¤ÖÆÌå
+        // 
         GameObject rectangleObj = Instantiate(path.unionPath ? unionPathPrefab : pathPrefab);
 
-        // Éè¶¨Ãû×Ö
+        // 
         string rectangleName = $"{path.star1.id}-{path.star2.id}";
         rectangleObj.name = rectangleName;
 
-        // Ìí¼Ótag
+        // 
         rectangleObj.tag = "Path";
 
-        // Éè¶¨¸¸¼¶
+        // 
         Transform parent = GameObject.Find("Map/Paths").transform;
         rectangleObj.transform.SetParent(parent);
 
-        // Ìí¼ÓPathData×é¼þ²¢³õÊ¼»¯Êý¾Ý
+        // 
         PathData pathData = rectangleObj.AddComponent<PathData>();
         pathData.Initialize(path);
 
-        // Éè¶¨Î»ÖÃºÍÐý×ª
+        // 
         rectangleObj.transform.position = new Vector3(midpoint.x, midpoint.y, -0.2f);
         rectangleObj.transform.rotation = Quaternion.Euler(0, 0, angleDeg);
 
-        // Éè¶¨´óÐ¡
+        // 
         rectangleObj.transform.localScale = new Vector3(length, 1, 1);
 
         return rectangleObj;
@@ -166,21 +172,21 @@ public class GameManager : MonoBehaviour
         GameObject prefab;
         Transform parent;
 
-        // ·ÖÀàÉè¶¨äÖÈ¾ÎïÒÔ¼°¸¸¼¶
-        if (star.type == 1) 
-        { 
+        // 
+        if (star.type == 1)
+        {
             prefab = this.blackholePrefab;
             parent = GameObject.Find("Map/Stars/Blackhole").transform;
         }
         else
         {
-            if (star.isLivable) 
-            { 
+            if (star.isLivable)
+            {
                 prefab = this.livableStarPrefab;
                 parent = GameObject.Find("Map/Stars/LivableStars").transform;
             }
-            else 
-            { 
+            else
+            {
                 prefab = this.starPrefab;
                 parent = GameObject.Find("Map/Stars/ResourcesStars").transform;
             }
@@ -190,10 +196,10 @@ public class GameManager : MonoBehaviour
         GameObject newStar = Instantiate(prefab, starPosition, Quaternion.identity, parent);
         newStar.name = star.id.ToString();
 
-        // ÎªÐÂµÄÐÇÐÇGameObjectÉèÖÃ±êÇ©
+        // 
         newStar.tag = "Star";
 
-        // Ìí¼ÓStarData×é¼þ²¢³õÊ¼»¯Êý¾Ý
+        // 
         StarData starData = newStar.AddComponent<StarData>();
         starData.Initialize(star);
 
