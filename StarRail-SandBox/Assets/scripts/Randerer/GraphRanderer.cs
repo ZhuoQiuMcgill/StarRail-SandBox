@@ -37,7 +37,7 @@ namespace Rander
                 positionTexture.SetPixel(index, 0, new Color(normalizedX, normalizedY, 0, 0));
                 colorTexture.SetPixel(index, 0, vertex.color);
 
-                Debug.Log(vertex.id + ": " + vertex.color);
+                Debug.Log(vertex.id + ": " + normalizedX + "," + normalizedY);
 
                 index++;
             }

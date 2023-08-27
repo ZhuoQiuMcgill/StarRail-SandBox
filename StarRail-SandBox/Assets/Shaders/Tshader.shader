@@ -18,10 +18,6 @@ Shader "Unlit/Tshader"
             #pragma fragment frag
             #include "UnityCG.cginc"
 
-            sampler2D _PositionTex;
-            sampler2D _ColorTex;
-            float _Radius;
-
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -35,6 +31,9 @@ Shader "Unlit/Tshader"
             };
 
             sampler2D _MainTex;
+            sampler2D _PositionTex;
+            sampler2D _ColorTex;
+            float _Radius;
             float4 _MainTex_ST;
 
             v2f vert(appdata v)
@@ -45,24 +44,31 @@ Shader "Unlit/Tshader"
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                float2 pixelPos = i.uv;
-                float minDist = _Radius;
-                float4 color = float4(0,0,0,1); // Default to black
+                float2 currentPoint = i.uv; // 当前像素的UV坐标
+                float minDistance = 1.0; // 初始化最小距离为1（最大距离）
+                float4 nearestColor = float4(1, 1, 1, 1); // 初始化最近点颜色为白色
 
-                for (int j = 0; j < 800; j++) 
+                // 循环遍历所有种子点
+                for (int j = 0; j < 800; j++)
                 {
-                    float2 starPos = tex2D(_PositionTex, float2(j / 800.0, 0.5)).xy;
-                    float dist = distance(starPos, pixelPos);
-                    if (dist < minDist)
+                    float2 seed = tex2D(_PositionTex, float2((j + 0.5) / 800.0, 0.5)).xy; // 从纹理中获取种子点坐标
+                    float4 seedColor = tex2D(_ColorTex, float2((j + 0.5) / 800.0, 0.5)); // 从纹理中获取种子点颜色
+
+                    float distToSeed = distance(seed, currentPoint); // 使用内置函数计算距离
+
+                    // 如果这个点更近，更新最近点和最小距离
+                    if (distToSeed < minDistance)
                     {
-                        color = tex2D(_ColorTex, float2(j / 800.0, 0.5));
-                        minDist = dist;
+                        minDistance = distToSeed;
+                        nearestColor = seedColor;
                     }
                 }
-                return color;
+
+                return nearestColor; // 返回最近点的颜色
             }
+
             ENDCG
         }
     }

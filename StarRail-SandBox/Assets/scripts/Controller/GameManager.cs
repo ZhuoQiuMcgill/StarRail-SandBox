@@ -41,6 +41,11 @@ public class GameManager : MonoBehaviour
         MapElement.Galaxy map = new MapElement.Galaxy(this.numStars, this.width, this.height);
         this.map = map;
 
+        MapElement.Star debugStar = new MapElement.Star(114514, new Vector2(0f, 0f), 0.0, 0.0);
+        debugStar.type = 114514;
+        debugStar.setColor();
+        this.map.stars.Add(debugStar);
+
         Rander.GraphRanderer randerer = new Rander.GraphRanderer(this.map, this.voronoiMaterial);
         this.randerer = randerer;
         this.randerer.RenderGraph();
