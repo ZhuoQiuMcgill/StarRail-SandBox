@@ -58,13 +58,16 @@ Shader "Unlit/Tshader"
             {
                 if (i.uv.x < _TopLeft.x || i.uv.x > _TopRight.x || i.uv.y > _TopLeft.y || i.uv.y < _BottomRight.y)
                 {
-                    return fixed4(0,0,0,1); // 不在视野内，直接返回黑色
+                    return fixed4(0, 0, 0, 1); // 不在视野内，直接返回黑色
+                }
+                if (distance(i.uv, float2(0.5, 0.5)) > 0.5)
+                {
+                    return fixed4(0, 0, 0, 1); 
                 }
 
                 float2 currentPoint = i.uv; // 当前像素的UV坐标
                 float minDistance = 1.0; // 初始化最小距离为1（最大距离）
                 float4 nearestColor = float4(1, 1, 1, 1); // 初始化最近点颜色为白色
-
 
                 for (int j = 0; j < 800; j++)
                 {
