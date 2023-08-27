@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
     public float minSize = 2f;
     public float maxSize = 5000;
 
+
     void Update()
     {
         // 获取WASD键的输入
@@ -29,5 +30,6 @@ public class CameraController : MonoBehaviour
 
         // 根据输入调整镜头的Size
         Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - scrollInput * zoomSpeed, minSize, maxSize);
+
     }
 }
