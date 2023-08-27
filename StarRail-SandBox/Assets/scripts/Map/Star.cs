@@ -97,7 +97,7 @@ namespace MapElement
 
         public void setColor()
         {
-            if (this.type == 1) { this.color = new Vector4(148.0f / 255.0f, 0, 211.0f / 255.0f, 1f); }
+            if (this.type == 1) { this.color = new Vector4(0.14f, 0.0f, 0.2f, 1f); }
             else if (this.type == 114514) 
             { 
                 this.color = new Vector4(1f, 1f, 0f, 1f);
@@ -105,8 +105,8 @@ namespace MapElement
             }
             else
             {
-                if (this.isLivable) { this.color = new Vector4(0.0f, 0.3f, 0.5f, 1f); }
-                else { this.color = new Vector4(0.3f, 0.0f, 0.0f, 1f); }
+                if (this.isLivable) { this.color = new Vector4(0.0f, 0.2f, 0.0f, 1f); }
+                else { this.color = new Vector4(0.0f, 0.0f, 0.0f, 1f); }
             }
         }
 
